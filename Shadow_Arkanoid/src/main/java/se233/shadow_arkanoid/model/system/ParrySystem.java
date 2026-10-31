@@ -32,6 +32,11 @@ public final class ParrySystem {
         cooldownRemaining = Math.max(0, cooldownRemaining - deltaTime);
     }
 
+
+    public void triggerCooldown() {
+        cooldownRemaining = GameConfig.PARRY_COOLDOWN_SECONDS;
+    }
+
     public void improveTimingWindow(double seconds) {
         if (!Double.isFinite(seconds) || seconds <= 0) {
             throw new IllegalArgumentException("Timing window increase must be positive");

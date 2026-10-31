@@ -82,6 +82,17 @@ public final class Ball {
         velocityY = velocityY / speed * target;
     }
 
+    public void setSpeed(double targetSpeed) {
+        double currentSpeed = speed();
+
+        if (currentSpeed == 0){
+            return;
+        }
+
+        velocityX = (velocityX / currentSpeed) * targetSpeed;
+        velocityY = (velocityY / currentSpeed) * targetSpeed;
+    }
+
     public void setPiercing(boolean piercing) {
         this.piercing = piercing;
     }

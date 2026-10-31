@@ -80,8 +80,11 @@ public final class PhysicsEngine {
                 preventHorizontalTrap(ball);
                 wallHit = true;
             }
+
+            // set ball speed to normal when Piercing ball hit the wall
             if (wallHit && ball.isPiercing()) {
                 ball.setPiercing(false);
+                ball.setSpeed(GameConfig.BALL_INITIAL_SPEED); // set speed to normal
             }
 
             if (ball.velocityY() > 0 && ball.y() + ball.radius() >= paddle.y()

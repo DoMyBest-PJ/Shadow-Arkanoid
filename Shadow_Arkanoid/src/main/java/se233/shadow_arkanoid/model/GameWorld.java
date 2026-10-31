@@ -153,12 +153,24 @@ public final class GameWorld {
         }
     }
 
+    // Texts when parry
     public boolean attemptParry() {
+
+        // display message when player parry while it's cooldown don't finish
+        if (parrySystem.cooldownRemaining() > 0) {
+            showMessage("PARRY IS NOT READY!",0.65);
+            events.add("PARRY_FAILED");
+            return false;
+        }
+
+        // display message when player parry miss
         if (state != GameState.PLAYING || balls.isEmpty()) {
             showMessage("PARRY MISS", 0.65);
             events.add("PARRY_FAILED");
             return false;
         }
+
+
         for (Ball ball : balls) {
             if (parrySystem.attempt(ball, paddle)) {
                 scoreManager.add(GameConfig.PARRY_BONUS);
@@ -168,6 +180,9 @@ public final class GameWorld {
                 return true;
             }
         }
+
+        parrySystem.triggerCooldown();
+
         showMessage("PARRY MISS", 0.65);
         events.add("PARRY_FAILED");
         LOGGER.debug("Perfect Parry attempt missed");
