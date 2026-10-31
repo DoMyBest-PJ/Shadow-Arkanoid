@@ -153,7 +153,16 @@ public final class GameWorld {
         }
     }
 
+    // Texts when parry
     public boolean attemptParry() {
+
+        // if parry cooldown...
+        if (parrySystem.cooldownRemaining() > 0) {
+            showMessage("PARRY IS NOT READY!",0.65);
+            events.add("PARRY_FAILED");
+            return false;
+        }
+
         if (state != GameState.PLAYING || balls.isEmpty()) {
             showMessage("PARRY MISS", 0.65);
             events.add("PARRY_FAILED");
