@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid.physics;
+package se233.shadow_arkanoid.model.physics;
 
 import java.util.ArrayList;
 import java.util.List;

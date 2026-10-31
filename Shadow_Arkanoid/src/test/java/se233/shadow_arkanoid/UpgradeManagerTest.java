@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
-import se233.shadow_arkanoid.upgrade.UpgradeManager;
+import se233.shadow_arkanoid.model.upgrade.UpgradeManager;
 
 class UpgradeManagerTest {
     @Test

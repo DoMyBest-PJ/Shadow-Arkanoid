@@ -7,9 +7,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se233.shadow_arkanoid.audio.SoundManager;
 import se233.shadow_arkanoid.controller.GameController;
-import se233.shadow_arkanoid.ui.GameRenderer;
+import se233.shadow_arkanoid.view.GameRenderer;
+import se233.shadow_arkanoid.view.audio.SoundManager;
 
 public final class GameApplication extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameApplication.class);
@@ -34,11 +34,11 @@ public final class GameApplication extends Application {
         stage.setOnCloseRequest(event -> controller.stop());
         stage.show();
         controller.start();
-        LOGGER.info("Arkanoid Roguelike application started");
+        LOGGER.info("Shadow Arkanoid started");
     }
 
     @Override
     public void stop() {
-        LOGGER.info("Arkanoid Roguelike application stopped");
+        LOGGER.info("Shadow Arkanoid stopped");
     }
 }

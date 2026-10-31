@@ -8,8 +8,8 @@ import se233.shadow_arkanoid.model.Ball;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
 import se233.shadow_arkanoid.model.Paddle;
-import se233.shadow_arkanoid.system.LifeManager;
-import se233.shadow_arkanoid.system.ParrySystem;
+import se233.shadow_arkanoid.model.system.LifeManager;
+import se233.shadow_arkanoid.model.system.ParrySystem;
 
 class ManagersTest {
     @Test

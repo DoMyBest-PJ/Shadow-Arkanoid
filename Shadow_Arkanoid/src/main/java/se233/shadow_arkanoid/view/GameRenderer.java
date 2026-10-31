@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid.ui;
+package se233.shadow_arkanoid.view;
 
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -17,9 +17,12 @@ import se233.shadow_arkanoid.model.Brick;
 import se233.shadow_arkanoid.model.BrickType;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
-import se233.shadow_arkanoid.upgrade.Upgrade;
+import se233.shadow_arkanoid.model.upgrade.Upgrade;
 
 public final class GameRenderer {
+    public static final double BGM_SLIDER_LEFT = 82;
+    public static final double BGM_SLIDER_RIGHT = 202;
+    public static final double BGM_SLIDER_Y = 604;
     private static final Color BACKGROUND = Color.web("#080d1b");
     private static final Color CYAN = Color.web("#35e7ff");
     private static final Color MAGENTA = Color.web("#ff4fc8");
@@ -33,7 +36,7 @@ public final class GameRenderer {
         this.canvas = canvas;
     }
 
-    public void render(GameWorld world) {
+    public void render(GameWorld world, double musicVolume) {
         double canvasWidth = canvas.getWidth();
         double canvasHeight = canvas.getHeight();
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -64,6 +67,7 @@ public final class GameRenderer {
                 default -> { }
             }
         }
+        drawFooter(gc, world, musicVolume);
         gc.restore();
     }
 
@@ -98,7 +102,7 @@ public final class GameRenderer {
         gc.fillText("ARKANOID", GameConfig.WIDTH / 2, 175);
         gc.setFill(CYAN);
         gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 25));
-        gc.fillText("ROGUELIKE", GameConfig.WIDTH / 2, 222);
+        gc.fillText("SHADOW-TWICE", GameConfig.WIDTH / 2, 222);
         gc.setEffect(null);
         drawButton(gc, "START GAME", 380, 310, 200, 52, CYAN);
         drawButton(gc, "HOW TO PLAY", 380, 382, 200, 52, MAGENTA);
@@ -120,9 +124,9 @@ public final class GameRenderer {
         String[] lines = {
                 "A / LEFT ARROW     Move left",
                 "D / RIGHT ARROW    Move right",
-                "MOUSE              Move paddle",
-                "SPACE / LEFT CLICK Launch the ball",
-                "RIGHT CLICK         Attempt a Perfect Parry",
+                "KEYBOARD ONLY      Move the paddle",
+                "SPACE              Launch / Attempt a Perfect Parry",
+                "LEFT CLICK         Select menu options",
                 "",
                 "Break every brick to clear a stage and choose an upgrade.",
                 "Strong bricks take two hits. Bonus bricks award extra points.",
@@ -130,7 +134,7 @@ public final class GameRenderer {
                 "A Perfect Parry grants +100 points and a 1.25x speed boost.",
                 "The faster ball pierces every brick until it hits a top,",
                 "left, or right wall. Brick hits never end piercing.",
-                "You have three lives. Pause with ESC or P."
+                "You have three lives. Press ESC or P to pause."
         };
         double y = 205;
         for (String line : lines) {
@@ -180,7 +184,7 @@ public final class GameRenderer {
         gc.fillText("LIVES  " + world.lifeManager().lives(), GameConfig.WIDTH / 2, 25);
         gc.setFill(Color.web("#9aaccc"));
         gc.setFont(Font.font("Monospaced", 12));
-        gc.fillText("A / D  MOVE     RIGHT CLICK  PARRY", GameConfig.WIDTH / 2, 48);
+        gc.fillText("A / D  MOVE     SPACE  PARRY", GameConfig.WIDTH / 2, 48);
         drawParryMeter(gc, world);
         if (!world.activeUpgrades().isEmpty()) {
             gc.setTextAlign(TextAlignment.RIGHT);
@@ -267,6 +271,30 @@ public final class GameRenderer {
         gc.fillText(status, GameConfig.WIDTH / 2, GameConfig.HEIGHT - 18);
     }
 
+    private void drawFooter(GraphicsContext gc, GameWorld world, double musicVolume) {
+        double sliderY = BGM_SLIDER_Y;
+        double handleX = BGM_SLIDER_LEFT + (BGM_SLIDER_RIGHT - BGM_SLIDER_LEFT) * musicVolume;
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 11));
+        gc.setFill(Color.web("#9aaccc"));
+        gc.fillText("BGM", 30, sliderY);
+        gc.setStroke(Color.web("#34476a"));
+        gc.setLineWidth(5);
+        gc.strokeLine(BGM_SLIDER_LEFT, sliderY, BGM_SLIDER_RIGHT, sliderY);
+        gc.setStroke(CYAN);
+        gc.strokeLine(BGM_SLIDER_LEFT, sliderY, handleX, sliderY);
+        gc.setFill(Color.WHITE);
+        gc.fillOval(handleX - 6, sliderY - 6, 12, 12);
+        gc.setFill(Color.web("#9aaccc"));
+        gc.setFont(Font.font("Monospaced", 10));
+        gc.fillText(Math.round(musicVolume * 100) + "%", BGM_SLIDER_RIGHT + 12, sliderY);
+        gc.setTextAlign(TextAlignment.RIGHT);
+        gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 12));
+        gc.setFill(Color.web("#f4cd75"));
+        gc.fillText("HIGHEST SCORE  " + world.scoreManager().highestScore(), GameConfig.WIDTH - 30, sliderY);
+    }
+
     private void drawReady(GraphicsContext gc) {
         gc.setFill(Color.rgb(5, 8, 18, 0.38));
         gc.fillRect(0, 80, GameConfig.WIDTH, 500);
@@ -282,15 +310,13 @@ public final class GameRenderer {
 
     private void drawPause(GraphicsContext gc) {
         drawOverlay(gc);
-        drawPanel(gc, 300, 235, 360, 170);
+        drawPanel(gc, 300, 220, 360, 220);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFill(CYAN);
         gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 31));
-        gc.fillText("PAUSED", GameConfig.WIDTH / 2, 280);
-        drawButton(gc, "RESUME  (ESC)", 370, 320, 220, 48, MAGENTA);
-        gc.setFill(Color.web("#c2cee5"));
-        gc.setFont(Font.font("Monospaced", 12));
-        gc.fillText("Press P to resume", GameConfig.WIDTH / 2, 390);
+        gc.fillText("PAUSED", GameConfig.WIDTH / 2, 265);
+        drawButton(gc, "RESUME", 370, 310, 220, 48, MAGENTA);
+        drawButton(gc, "MAIN MENU", 370, 370, 220, 48, CYAN);
     }
 
     private void drawUpgradeSelection(GraphicsContext gc, GameWorld world) {

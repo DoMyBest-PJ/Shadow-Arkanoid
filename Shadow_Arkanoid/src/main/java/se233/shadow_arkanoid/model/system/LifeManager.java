@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid.system;
+package se233.shadow_arkanoid.model.system;
 
 public final class LifeManager {
     private int lives;

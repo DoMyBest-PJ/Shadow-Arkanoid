@@ -9,7 +9,7 @@ import se233.shadow_arkanoid.model.Ball;
 import se233.shadow_arkanoid.model.Brick;
 import se233.shadow_arkanoid.model.BrickType;
 import se233.shadow_arkanoid.model.Paddle;
-import se233.shadow_arkanoid.physics.PhysicsEngine;
+import se233.shadow_arkanoid.model.physics.PhysicsEngine;
 
 class PhysicsEngineTest {
     private final PhysicsEngine physics = new PhysicsEngine();

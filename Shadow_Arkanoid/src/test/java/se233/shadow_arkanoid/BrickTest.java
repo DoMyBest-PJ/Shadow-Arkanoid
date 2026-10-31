@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import se233.shadow_arkanoid.model.Brick;
 import se233.shadow_arkanoid.model.BrickType;
-import se233.shadow_arkanoid.system.ScoreManager;
+import se233.shadow_arkanoid.model.system.ScoreManager;
 
 class BrickTest {
     @Test

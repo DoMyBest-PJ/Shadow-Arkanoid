@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid.upgrade;
+package se233.shadow_arkanoid.model.upgrade;
 
 import se233.shadow_arkanoid.model.GameWorld;
 

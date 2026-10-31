@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid.system;
+package se233.shadow_arkanoid.model.system;
 
 import se233.shadow_arkanoid.GameConfig;
 import se233.shadow_arkanoid.model.Ball;

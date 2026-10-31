@@ -10,10 +10,10 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se233.shadow_arkanoid.GameConfig;
-import se233.shadow_arkanoid.audio.SoundManager;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
-import se233.shadow_arkanoid.ui.GameRenderer;
+import se233.shadow_arkanoid.view.GameRenderer;
+import se233.shadow_arkanoid.view.audio.SoundManager;
 
 public final class GameController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
@@ -24,6 +24,7 @@ public final class GameController {
     private final EnumSet<KeyCode> pressedKeys = EnumSet.noneOf(KeyCode.class);
     private AnimationTimer animationTimer;
     private long previousFrame;
+    private boolean adjustingMusicVolume;
 
     public GameController(Canvas canvas, GameRenderer renderer, SoundManager soundManager) {
         this.canvas = canvas;
@@ -39,18 +40,15 @@ public final class GameController {
             }
         });
         scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
-        canvas.setOnMouseMoved(event -> {
-            if (!pressedKeys.contains(KeyCode.A) && !pressedKeys.contains(KeyCode.LEFT)
-                    && !pressedKeys.contains(KeyCode.D) && !pressedKeys.contains(KeyCode.RIGHT)
-                    && (world.state() == GameState.READY || world.state() == GameState.PLAYING)) {
-                world.movePaddleTo(renderer.logicalX(event.getX()));
+        canvas.setOnMouseDragged(event -> {
+            if (adjustingMusicVolume) {
+                setMusicVolumeAt(renderer.logicalX(event.getX()));
             }
         });
+        canvas.setOnMouseReleased(event -> adjustingMusicVolume = false);
         canvas.setOnMousePressed(event -> {
             canvas.requestFocus();
-            if (event.getButton() == MouseButton.SECONDARY) {
-                world.attemptParry();
-            } else if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getButton() == MouseButton.PRIMARY) {
                 handleClick(renderer.logicalX(event.getX()), renderer.logicalY(event.getY()));
             }
         });
@@ -60,6 +58,7 @@ public final class GameController {
         if (animationTimer != null) {
             return;
         }
+        syncMusicWithGameState();
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -68,10 +67,11 @@ public final class GameController {
                 double direction = (pressedKeys.contains(KeyCode.D) || pressedKeys.contains(KeyCode.RIGHT) ? 1 : 0)
                         - (pressedKeys.contains(KeyCode.A) || pressedKeys.contains(KeyCode.LEFT) ? 1 : 0);
                 world.update(Math.min(deltaTime, 0.05), direction);
+                syncMusicWithGameState();
                 for (String event : world.drainEvents()) {
                     soundManager.play(event);
                 }
-                renderer.render(world);
+                renderer.render(world, soundManager.musicVolume());
             }
         };
         animationTimer.start();
@@ -88,7 +88,15 @@ public final class GameController {
     private void handleKeyPressed(KeyCode code) {
         if (code == KeyCode.ESCAPE || code == KeyCode.P) {
             world.pause();
-        } else if (code == KeyCode.SPACE || code == KeyCode.ENTER) {
+        } else if (code == KeyCode.SPACE) {
+            if (world.state() == GameState.READY) {
+                world.launch();
+            } else if (world.state() == GameState.PLAYING) {
+                world.attemptParry();
+            } else if (world.state() == GameState.MAIN_MENU) {
+                world.startNewGame();
+            }
+        } else if (code == KeyCode.ENTER) {
             if (world.state() == GameState.READY) {
                 world.launch();
             } else if (world.state() == GameState.MAIN_MENU) {
@@ -100,6 +108,11 @@ public final class GameController {
     }
 
     private void handleClick(double x, double y) {
+        if (isOnMusicSlider(x, y)) {
+            adjustingMusicVolume = true;
+            setMusicVolumeAt(x);
+            return;
+        }
         switch (world.state()) {
             case MAIN_MENU -> {
                 if (inside(x, y, 380, 310, 200, 52)) {
@@ -117,7 +130,13 @@ public final class GameController {
                 }
             }
             case READY -> world.launch();
-            case PAUSED -> world.pause();
+            case PAUSED -> {
+                if (inside(x, y, 370, 310, 220, 48)) {
+                    world.pause();
+                } else if (inside(x, y, 370, 370, 220, 48)) {
+                    world.returnToMenu();
+                }
+            }
             case UPGRADE_SELECTION -> {
                 double cardWidth = 250;
                 double gap = 22;
@@ -138,6 +157,25 @@ public final class GameController {
             }
             default -> { }
         }
+    }
+
+    private void syncMusicWithGameState() {
+        if (world.state() == GameState.MAIN_MENU || world.state() == GameState.HOW_TO_PLAY) {
+            soundManager.playMusic("BGM_START");
+        } else {
+            soundManager.playMusic("BGM_INGAME");
+        }
+    }
+
+    private boolean isOnMusicSlider(double x, double y) {
+        return Math.abs(y - GameRenderer.BGM_SLIDER_Y) <= 16
+                && x >= GameRenderer.BGM_SLIDER_LEFT - 12 && x <= GameRenderer.BGM_SLIDER_RIGHT + 12;
+    }
+
+    private void setMusicVolumeAt(double x) {
+        double volume = (x - GameRenderer.BGM_SLIDER_LEFT)
+                / (GameRenderer.BGM_SLIDER_RIGHT - GameRenderer.BGM_SLIDER_LEFT);
+        soundManager.setMusicVolume(Math.max(0, Math.min(1, volume)));
     }
 
     private boolean inside(double x, double y, double left, double top, double width, double height) {

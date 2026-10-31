@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid.upgrade;
+package se233.shadow_arkanoid.model.upgrade;
 
 import java.util.ArrayList;
 import java.util.Collections;

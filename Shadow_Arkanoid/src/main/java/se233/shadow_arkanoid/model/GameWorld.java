@@ -5,13 +5,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se233.shadow_arkanoid.GameConfig;
-import se233.shadow_arkanoid.physics.PhysicsEngine;
-import se233.shadow_arkanoid.system.LifeManager;
-import se233.shadow_arkanoid.system.ParrySystem;
-import se233.shadow_arkanoid.system.ScoreManager;
-import se233.shadow_arkanoid.system.StageManager;
-import se233.shadow_arkanoid.upgrade.Upgrade;
-import se233.shadow_arkanoid.upgrade.UpgradeManager;
+import se233.shadow_arkanoid.model.physics.PhysicsEngine;
+import se233.shadow_arkanoid.model.system.LifeManager;
+import se233.shadow_arkanoid.model.system.ParrySystem;
+import se233.shadow_arkanoid.model.system.ScoreManager;
+import se233.shadow_arkanoid.model.system.StageManager;
+import se233.shadow_arkanoid.model.upgrade.Upgrade;
+import se233.shadow_arkanoid.model.upgrade.UpgradeManager;
 
 public final class GameWorld {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameWorld.class);

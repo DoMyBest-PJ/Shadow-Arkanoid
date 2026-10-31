@@ -3,7 +3,7 @@ package se233.shadow_arkanoid;
 import se233.shadow_arkanoid.exception.GameConfigurationException;
 
 public final class GameConfig {
-    public static final String TITLE = "ARKANOID ROGUELIKE";
+    public static final String TITLE = "SHADOW ARKANOID";
     public static final double WIDTH = 960;
     public static final double HEIGHT = 640;
     public static final double WALL_MARGIN = 28;
@@ -28,9 +28,6 @@ public final class GameConfig {
 
     static {
         validate();
-    }
-
-    private GameConfig() {
     }
 
     private static void validate() {
