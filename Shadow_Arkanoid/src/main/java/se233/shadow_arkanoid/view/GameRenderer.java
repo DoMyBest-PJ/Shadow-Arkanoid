@@ -122,14 +122,14 @@ public final class GameRenderer {
         gc.setFill(Color.web("#dce8ff"));
         gc.setFont(Font.font("Monospaced", 16));
         String[] lines = {
+                "KEYBOARD ONLY      Move the paddle",
                 "A / LEFT ARROW     Move left",
                 "D / RIGHT ARROW    Move right",
-                "KEYBOARD ONLY      Move the paddle",
-                "SPACE              Launch / Attempt a Perfect Parry",
-                "LEFT CLICK         Select menu options",
+                "SPACE              Attempt to Parry",
+                "ESC                Open menu",
                 "",
                 "Break every brick to clear a stage and choose an upgrade.",
-                "Strong bricks take two hits. Bonus bricks award extra points.",
+                "Strong bricks take more hit. Bonus bricks award extra points.",
                 "Parry just before a descending ball reaches your paddle.",
                 "A Perfect Parry grants +100 points and a 1.25x speed boost.",
                 "The faster ball pierces every brick until it hits a top,",
