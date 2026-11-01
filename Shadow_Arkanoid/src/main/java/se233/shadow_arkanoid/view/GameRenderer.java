@@ -21,9 +21,13 @@ import se233.shadow_arkanoid.model.BrickType;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
 import se233.shadow_arkanoid.model.upgrade.Upgrade;
+import se233.shadow_arkanoid.model.Paddle;
 import se233.shadow_arkanoid.view.effects.VisualEffectManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class GameRenderer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameRenderer.class);
     public static final double BGM_SLIDER_LEFT = 82;
     public static final double BGM_SLIDER_RIGHT = 202;
     private static final double BGM_SLIDER_Y = GameConfig.HEIGHT - 55;
@@ -61,6 +65,7 @@ public final class GameRenderer {
     private final DropShadow specialSkillGlow = new DropShadow(12, Color.web("#ff857d"));
     private final Image specialSkillImage = loadImage(
             "/se233/shadow_arkanoid/assets/picture/special_skill.png");
+    private final Image katanaPaddleSpriteSheet = loadKatanaPaddleSpriteSheet();
     private final VisualEffectManager visualEffects = new VisualEffectManager();
     private double scale = 1;
     private double offsetX;
@@ -395,14 +400,63 @@ public final class GameRenderer {
         return image;
     }
 
+    private static Image loadKatanaPaddleSpriteSheet() {
+        var resource = GameRenderer.class.getResource(
+                "/se233/shadow_arkanoid/assets/picture/katana_paddle_spriteSheet.png");
+        if (resource == null) {
+            resource = GameRenderer.class.getResource(
+                    "/se233/shadow_arkanoid/assets/picture/\u0E49katana_paddle_spriteSheet.png");
+        }
+        if (resource == null) {
+            LOGGER.warn("Missing katana paddle sprite sheet resource");
+            return null;
+        }
+        Image image = new Image(resource.toExternalForm(), false);
+        if (image.isError()) {
+            LOGGER.warn("Could not load katana paddle sprite sheet", image.getException());
+            return null;
+        }
+        return image;
+    }
+
     private void drawPaddle(GraphicsContext gc, GameWorld world) {
-        gc.setEffect(new DropShadow(16, Color.web("#27d8ff")));
-        gc.setFill(new LinearGradient(world.paddle().left(), 0, world.paddle().right(), 0, false,
-                CycleMethod.NO_CYCLE, new Stop(0, Color.web("#497dff")), new Stop(0.5, Color.web("#6bf5ff")),
-                new Stop(1, Color.web("#497dff"))));
-        gc.fillRoundRect(world.paddle().left(), world.paddle().y(), world.paddle().width(),
-                world.paddle().height(), 14, 14);
-        gc.setEffect(null);
+        Paddle paddle = world.paddle();
+        if (katanaPaddleSpriteSheet != null) {
+            double cycleTime = visualEffects.elapsedTime() % GameConfig.KATANA_PADDLE_ANIMATION_CYCLE_SECONDS;
+            int frameIndex = (int) ((cycleTime / GameConfig.KATANA_PADDLE_ANIMATION_CYCLE_SECONDS)
+                    * GameConfig.KATANA_PADDLE_SPRITE_FRAME_COUNT);
+            frameIndex = Math.min(GameConfig.KATANA_PADDLE_SPRITE_FRAME_COUNT - 1, Math.max(0, frameIndex));
+
+            int col = frameIndex % GameConfig.KATANA_PADDLE_SPRITE_COLUMNS;
+            int row = frameIndex / GameConfig.KATANA_PADDLE_SPRITE_COLUMNS;
+            double sx = col * GameConfig.KATANA_PADDLE_SPRITE_FRAME_WIDTH;
+            double sy = row * GameConfig.KATANA_PADDLE_SPRITE_FRAME_HEIGHT;
+            double sw = GameConfig.KATANA_PADDLE_SPRITE_FRAME_WIDTH;
+            double sh = GameConfig.KATANA_PADDLE_SPRITE_FRAME_HEIGHT;
+
+            double drawWidth = paddle.width() * (288.0 / 266.0);
+            double drawHeight = drawWidth * (48.0 / 288.0);
+            double drawX = paddle.centerX() - drawWidth / 2.0;
+            double drawY = paddle.y() - (17.0 / 48.0) * drawHeight;
+
+            gc.save();
+            DropShadow glow = world.parrySystem().isAvailable()
+                    ? new DropShadow(18, Color.web("#27d8ff"))
+                    : new DropShadow(12, Color.web("#ff4fc8"));
+            gc.setEffect(glow);
+            gc.drawImage(katanaPaddleSpriteSheet,
+                    sx, sy, sw, sh,
+                    drawX, drawY, drawWidth, drawHeight);
+            gc.restore();
+        } else {
+            gc.setEffect(new DropShadow(16, Color.web("#27d8ff")));
+            gc.setFill(new LinearGradient(paddle.left(), 0, paddle.right(), 0, false,
+                    CycleMethod.NO_CYCLE, new Stop(0, Color.web("#497dff")), new Stop(0.5, Color.web("#6bf5ff")),
+                    new Stop(1, Color.web("#497dff"))));
+            gc.fillRoundRect(paddle.left(), paddle.y(), paddle.width(),
+                    paddle.height(), 14, 14);
+            gc.setEffect(null);
+        }
     }
 
     private void drawBall(GraphicsContext gc, Ball ball, double energy) {
