@@ -27,7 +27,8 @@ public final class StageManager {
                 }
                 BrickType type = chooseType(stage, row, column);
                 bricks.add(new Brick(startX + column * (brickWidth + gapX),
-                        104 + row * (brickHeight + gapY), brickWidth, brickHeight, type));
+                        GameConfig.HUD_HEIGHT + 35 + row * (brickHeight + gapY),
+                        brickWidth, brickHeight, type));
             }
         }
         return bricks;

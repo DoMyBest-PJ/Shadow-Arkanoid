@@ -27,7 +27,7 @@ class ManagersTest {
         world.startNewGame();
         world.launch();
         Ball ball = world.balls().get(0);
-        ball.setPosition(world.paddle().centerX(), 550);
+        ball.setPosition(world.paddle().centerX(), world.paddle().y() - ball.radius() - 8);
         ball.setVelocity(0, 88);
         assertTrue(world.attemptParry());
         assertEquals(GameConfig.PARRY_BONUS, world.scoreManager().score());
@@ -41,14 +41,16 @@ class ManagersTest {
         world.startNewGame();
         world.launch();
         Ball ball = world.balls().get(0);
-        ball.setPosition(world.paddle().centerX() - 6, 550);
+        ball.setPosition(world.paddle().centerX() - 6, world.paddle().y() - ball.radius() - 8);
         ball.setVelocity(48, 88);
+        double timeToPaddle = (world.paddle().y() - ball.radius() - ball.y()) / ball.velocityY();
+        double expectedImpactX = ball.x() + ball.velocityX() * timeToPaddle;
 
         assertTrue(world.attemptParry());
 
         GameWorld.VisualCue cue = world.drainVisualCues().get(0);
         assertEquals(GameWorld.VisualCue.Type.PERFECT_PARRY, cue.type());
-        assertEquals(world.paddle().centerX(), cue.x(), 0.0001);
+        assertEquals(expectedImpactX, cue.x(), 0.0001);
         assertEquals(world.paddle().y() - ball.radius(), cue.y(), 0.0001);
     }
 
@@ -90,7 +92,8 @@ class ManagersTest {
     void cooldownPreventsRepeatedParryAttempts() {
         ParrySystem parry = new ParrySystem();
         Paddle paddle = new Paddle();
-        Ball ball = new Ball(paddle.centerX(), 550, 0, 88, GameConfig.BALL_RADIUS);
+        Ball ball = new Ball(paddle.centerX(), paddle.y() - GameConfig.BALL_RADIUS - 8,
+                0, 88, GameConfig.BALL_RADIUS);
         assertTrue(parry.attempt(ball, paddle));
         assertFalse(parry.attempt(ball, paddle));
     }

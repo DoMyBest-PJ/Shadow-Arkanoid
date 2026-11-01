@@ -17,18 +17,18 @@ class PhysicsEngineTest {
 
     @Test
     void ballReflectsFromLeftAndTopWalls() {
-        Ball left = new Ball(38, 200, -100, 0, 5);
+        Ball left = new Ball(7, 200, -100, 0, 5);
         physics.update(left, paddle, List.of(), 0.1);
         assertTrue(left.velocityX() > 0);
 
-        Ball top = new Ball(200, 72, 0, -100, 5);
+        Ball top = new Ball(200, 7, 0, -100, 5);
         physics.update(top, paddle, List.of(), 0.1);
         assertTrue(top.velocityY() > 0);
     }
 
     @Test
     void ballReflectsFromRightWall() {
-        Ball ball = new Ball(922, 200, 100, 0, 5);
+        Ball ball = new Ball(GameConfig.WIDTH - 7, 200, 100, 0, 5);
         physics.update(ball, paddle, List.of(), 0.1);
         assertTrue(ball.velocityX() < 0);
     }
@@ -65,7 +65,7 @@ class PhysicsEngineTest {
 
     @Test
     void piercingSurvivesPaddleContact() {
-        Ball ball = new Ball(paddle.centerX(), 550, 0, 200, GameConfig.BALL_RADIUS);
+        Ball ball = new Ball(paddle.centerX(), paddle.y() - 15, 0, 200, GameConfig.BALL_RADIUS);
         ball.setPiercing(true);
         PhysicsEngine.BallResult result = physics.update(ball, paddle, List.of(), 0.1);
         assertTrue(result.paddleHit());
@@ -75,14 +75,14 @@ class PhysicsEngineTest {
 
     @Test
     void piercingEndsAtTopLeftAndRightBoundaries() {
-        assertPiercingEnds(new Ball(200, 72, 0, -100, 5));
-        assertPiercingEnds(new Ball(38, 200, -100, 0, 5));
-        assertPiercingEnds(new Ball(922, 200, 100, 0, 5));
+        assertPiercingEnds(new Ball(200, 7, 0, -100, 5));
+        assertPiercingEnds(new Ball(7, 200, -100, 0, 5));
+        assertPiercingEnds(new Ball(GameConfig.WIDTH - 7, 200, 100, 0, 5));
     }
 
     @Test
     void wallHitResultIncludesTheClampedImpactPosition() {
-        Ball ball = new Ball(38, 200, -100, 0, 5);
+        Ball ball = new Ball(7, 200, -100, 0, 5);
         ball.setPiercing(true);
 
         PhysicsEngine.BallResult result = physics.update(ball, paddle, List.of(), 0.1);
