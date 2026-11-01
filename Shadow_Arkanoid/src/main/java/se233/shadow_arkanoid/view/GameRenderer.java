@@ -1,5 +1,6 @@
 package se233.shadow_arkanoid.view;
 
+import java.util.List;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -7,6 +8,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -18,6 +20,7 @@ import se233.shadow_arkanoid.model.BrickType;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
 import se233.shadow_arkanoid.model.upgrade.Upgrade;
+import se233.shadow_arkanoid.view.effects.VisualEffectManager;
 
 public final class GameRenderer {
     public static final double BGM_SLIDER_LEFT = 82;
@@ -26,8 +29,20 @@ public final class GameRenderer {
     private static final Color BACKGROUND = Color.web("#080d1b");
     private static final Color CYAN = Color.web("#35e7ff");
     private static final Color MAGENTA = Color.web("#ff4fc8");
+    private static final Color ENERGY_ORANGE = Color.web("#ff8518");
+    private static final RadialGradient ENERGY_HALO = new RadialGradient(0, 0, 0.5, 0.5, 0.5, true,
+            CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(255, 242, 188, 0.76)),
+            new Stop(0.35, Color.rgb(255, 143, 28, 0.52)),
+            new Stop(1, Color.TRANSPARENT));
+    private static final RadialGradient ENERGY_BALL = new RadialGradient(0, 0, 0.36, 0.32, 0.68, true,
+            CycleMethod.NO_CYCLE, new Stop(0, Color.web("#fff7d5")),
+            new Stop(0.24, Color.web("#ffd16b")),
+            new Stop(0.7, Color.web("#ff7b12")),
+            new Stop(1, Color.web("#d83b08")));
     private final Canvas canvas;
     private final DropShadow ballGlow = new DropShadow(18, Color.web("#65edff"));
+    private final DropShadow energyBallGlow = new DropShadow(23, Color.web("#ff7614"));
+    private final VisualEffectManager visualEffects = new VisualEffectManager();
     private double scale = 1;
     private double offsetX;
     private double offsetY;
@@ -77,6 +92,10 @@ public final class GameRenderer {
 
     public double logicalY(double canvasY) {
         return (canvasY - offsetY) / scale;
+    }
+
+    public void updateEffects(double deltaTime, List<GameWorld.VisualCue> cues, List<Ball> balls) {
+        visualEffects.update(deltaTime, cues, balls);
     }
 
     private void drawBackdrop(GraphicsContext gc) {
@@ -154,8 +173,9 @@ public final class GameRenderer {
             drawBrick(gc, brick);
         }
         drawPaddle(gc, world);
+        visualEffects.renderTrails(gc);
         for (Ball ball : world.balls()) {
-            drawBall(gc, ball);
+            drawBall(gc, ball, visualEffects.energyFor(ball));
         }
         if (!world.message().isEmpty()) {
             gc.setTextAlign(TextAlignment.CENTER);
@@ -167,6 +187,7 @@ public final class GameRenderer {
             gc.setEffect(null);
         }
         drawStatus(gc, world);
+        visualEffects.renderEffects(gc);
     }
 
     private void drawHud(GraphicsContext gc, GameWorld world) {
@@ -248,17 +269,31 @@ public final class GameRenderer {
         gc.setEffect(null);
     }
 
-    private void drawBall(GraphicsContext gc, Ball ball) {
-        if (ball.isPiercing()) {
-            gc.setStroke(Color.rgb(255, 86, 220, 0.45));
-            gc.setLineWidth(7);
-            gc.strokeLine(ball.x() - ball.velocityX() * 0.045, ball.y() - ball.velocityY() * 0.045,
-                    ball.x(), ball.y());
+    private void drawBall(GraphicsContext gc, Ball ball, double energy) {
+        double radius = ball.radius();
+        double diameter = radius * 2;
+        if (energy > 0) {
+            double pulse = 0.96 + 0.04 * Math.sin(visualEffects.elapsedTime() * 15);
+            double haloRadius = radius * 3.25 * pulse;
+            gc.save();
+            gc.setGlobalAlpha(energy);
+            gc.setFill(ENERGY_HALO);
+            gc.fillOval(ball.x() - haloRadius, ball.y() - haloRadius, haloRadius * 2, haloRadius * 2);
+            gc.setEffect(energyBallGlow);
+            gc.setFill(ENERGY_BALL);
+            gc.fillOval(ball.x() - radius, ball.y() - radius, diameter, diameter);
+            gc.setEffect(null);
+            gc.restore();
         }
-        gc.setEffect(ball.isPiercing() ? new DropShadow(20, MAGENTA) : ballGlow);
-        gc.setFill(ball.isPiercing() ? Color.web("#c42e14") : Color.WHITE);
-        gc.fillOval(ball.x() - ball.radius(), ball.y() - ball.radius(), ball.radius() * 2, ball.radius() * 2);
-        gc.setEffect(null);
+        if (energy < 1) {
+            gc.save();
+            gc.setGlobalAlpha(1 - energy);
+            gc.setEffect(ballGlow);
+            gc.setFill(Color.WHITE);
+            gc.fillOval(ball.x() - radius, ball.y() - radius, diameter, diameter);
+            gc.setEffect(null);
+            gc.restore();
+        }
     }
 
     private void drawStatus(GraphicsContext gc, GameWorld world) {
@@ -267,7 +302,7 @@ public final class GameRenderer {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 12));
-        gc.setFill(world.balls().stream().anyMatch(Ball::isPiercing) ? MAGENTA : Color.web("#8393b2"));
+        gc.setFill(world.balls().stream().anyMatch(Ball::isPiercing) ? ENERGY_ORANGE : Color.web("#8393b2"));
         gc.fillText(status, GameConfig.WIDTH / 2, GameConfig.HEIGHT - 18);
     }
 

@@ -36,6 +36,42 @@ class ManagersTest {
     }
 
     @Test
+    void perfectParryEmitsImpactAtPredictedPaddleContact() {
+        GameWorld world = new GameWorld();
+        world.startNewGame();
+        world.launch();
+        Ball ball = world.balls().get(0);
+        ball.setPosition(world.paddle().centerX() - 6, 550);
+        ball.setVelocity(48, 88);
+
+        assertTrue(world.attemptParry());
+
+        GameWorld.VisualCue cue = world.drainVisualCues().get(0);
+        assertEquals(GameWorld.VisualCue.Type.PERFECT_PARRY, cue.type());
+        assertEquals(world.paddle().centerX(), cue.x(), 0.0001);
+        assertEquals(world.paddle().y() - ball.radius(), cue.y(), 0.0001);
+    }
+
+    @Test
+    void piercingWallHitEmitsDissipationAtBoundaryContact() {
+        GameWorld world = new GameWorld();
+        world.startNewGame();
+        world.launch();
+        Ball ball = world.balls().get(0);
+        ball.setPiercing(true);
+        ball.setPosition(GameConfig.WALL_MARGIN + ball.radius() + 1, 200);
+        ball.setVelocity(-100, 0);
+
+        world.update(0.1, 0);
+
+        GameWorld.VisualCue cue = world.drainVisualCues().get(0);
+        assertEquals(GameWorld.VisualCue.Type.PIERCING_DISSIPATED, cue.type());
+        assertEquals(GameConfig.WALL_MARGIN + ball.radius(), cue.x(), 0.0001);
+        assertEquals(200, cue.y(), 0.0001);
+        assertFalse(ball.isPiercing());
+    }
+
+    @Test
     void failedParryDoesNotAwardPointsOrActivatePiercing() {
         GameWorld world = new GameWorld();
         world.startNewGame();

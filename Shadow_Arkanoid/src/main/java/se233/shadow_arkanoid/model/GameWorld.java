@@ -14,11 +14,19 @@ import se233.shadow_arkanoid.model.upgrade.Upgrade;
 import se233.shadow_arkanoid.model.upgrade.UpgradeManager;
 
 public final class GameWorld {
+    public record VisualCue(Type type, double x, double y) {
+        public enum Type {
+            PERFECT_PARRY,
+            PIERCING_DISSIPATED
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GameWorld.class);
     private final Paddle paddle = new Paddle();
     private final List<Ball> balls = new ArrayList<>();
     private final List<Brick> bricks = new ArrayList<>();
     private final List<String> events = new ArrayList<>();
+    private final List<VisualCue> visualCues = new ArrayList<>();
     private final ScoreManager scoreManager = new ScoreManager();
     private final LifeManager lifeManager = new LifeManager(GameConfig.STARTING_LIVES);
     private final ParrySystem parrySystem = new ParrySystem();
@@ -45,6 +53,7 @@ public final class GameWorld {
         balls.clear();
         bricks.clear();
         events.clear();
+        visualCues.clear();
         activeUpgrades.clear();
         upgradeChoices = List.of();
         stateTimer = 0;
@@ -128,6 +137,10 @@ public final class GameWorld {
             if (piercingBeforeStep && !ball.isPiercing()) {
                 showMessage("PIERCING ENDED", 0.8);
                 events.add("PIERCING_ENDED");
+                if (result.wallHit()) {
+                    visualCues.add(new VisualCue(VisualCue.Type.PIERCING_DISSIPATED,
+                            result.wallX(), result.wallY()));
+                }
                 LOGGER.info("Piercing ended at an outer wall");
             }
             if (result.paddleHit()) {
@@ -172,10 +185,13 @@ public final class GameWorld {
 
 
         for (Ball ball : balls) {
-            if (parrySystem.attempt(ball, paddle)) {
+            var impact = parrySystem.tryParry(ball, paddle);
+            if (impact.isPresent()) {
                 scoreManager.add(GameConfig.PARRY_BONUS);
                 showMessage("PERFECT PARRY!", 1.0);
                 events.add("PARRY_SUCCESS");
+                visualCues.add(new VisualCue(VisualCue.Type.PERFECT_PARRY,
+                        impact.get().x(), impact.get().y()));
                 LOGGER.info("Perfect Parry succeeded; piercing activated");
                 return true;
             }
@@ -217,6 +233,7 @@ public final class GameWorld {
         state = GameState.MAIN_MENU;
         balls.clear();
         bricks.clear();
+        visualCues.clear();
     }
 
     public void selectUpgrade(int index) {
@@ -286,6 +303,12 @@ public final class GameWorld {
     public List<String> drainEvents() {
         List<String> drained = List.copyOf(events);
         events.clear();
+        return drained;
+    }
+
+    public List<VisualCue> drainVisualCues() {
+        List<VisualCue> drained = List.copyOf(visualCues);
+        visualCues.clear();
         return drained;
     }
 

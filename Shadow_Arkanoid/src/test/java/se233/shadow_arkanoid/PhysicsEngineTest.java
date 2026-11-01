@@ -80,6 +80,18 @@ class PhysicsEngineTest {
         assertPiercingEnds(new Ball(922, 200, 100, 0, 5));
     }
 
+    @Test
+    void wallHitResultIncludesTheClampedImpactPosition() {
+        Ball ball = new Ball(38, 200, -100, 0, 5);
+        ball.setPiercing(true);
+
+        PhysicsEngine.BallResult result = physics.update(ball, paddle, List.of(), 0.1);
+
+        assertTrue(result.wallHit());
+        assertEquals(GameConfig.WALL_MARGIN + ball.radius(), result.wallX(), 0.0001);
+        assertEquals(200, result.wallY(), 0.0001);
+    }
+
     private void assertPiercingEnds(Ball ball) {
         ball.setPiercing(true);
         physics.update(ball, paddle, List.of(), 0.1);

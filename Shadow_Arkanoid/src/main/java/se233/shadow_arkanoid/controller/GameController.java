@@ -66,7 +66,9 @@ public final class GameController {
                 previousFrame = now;
                 double direction = (pressedKeys.contains(KeyCode.D) || pressedKeys.contains(KeyCode.RIGHT) ? 1 : 0)
                         - (pressedKeys.contains(KeyCode.A) || pressedKeys.contains(KeyCode.LEFT) ? 1 : 0);
-                world.update(Math.min(deltaTime, 0.05), direction);
+                double frameTime = Math.min(deltaTime, 0.05);
+                world.update(frameTime, direction);
+                renderer.updateEffects(frameTime, world.drainVisualCues(), world.balls());
                 syncMusicWithGameState();
                 for (String event : world.drainEvents()) {
                     soundManager.play(event);
