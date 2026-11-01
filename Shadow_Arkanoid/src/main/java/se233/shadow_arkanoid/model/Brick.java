@@ -37,6 +37,15 @@ public final class Brick {
         }
     }
 
+    public boolean destroy() {
+        if (destroyed) {
+            return false;
+        }
+        durability = 0;
+        destroyed = true;
+        return true;
+    }
+
     public boolean markDestructionAwarded() {
         if (!destroyed || destructionAwarded) {
             return false;

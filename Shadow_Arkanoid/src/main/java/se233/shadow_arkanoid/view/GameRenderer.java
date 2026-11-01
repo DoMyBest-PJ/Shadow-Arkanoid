@@ -5,6 +5,7 @@ import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
@@ -57,6 +58,9 @@ public final class GameRenderer {
     private final Canvas canvas;
     private final DropShadow ballGlow = new DropShadow(18, Color.web("#65edff"));
     private final DropShadow energyBallGlow = new DropShadow(23, Color.web("#ff7614"));
+    private final DropShadow specialSkillGlow = new DropShadow(12, Color.web("#ff857d"));
+    private final Image specialSkillImage = loadImage(
+            "/se233/shadow_arkanoid/assets/picture/special_skill.png");
     private final VisualEffectManager visualEffects = new VisualEffectManager();
     private double scale = 1;
     private double offsetX;
@@ -253,6 +257,7 @@ public final class GameRenderer {
                 "",
                 "Break every brick to clear a stage and choose an upgrade.",
                 "Strong bricks take more hit. Bonus bricks award extra points.",
+                "Catch SPECIAL SKILL drops to slash a vertical brick line.",
                 "Parry just before a descending ball reaches your paddle.",
                 "A Perfect Parry grants +150 points and get pierces.",
                 "The Perfect Parry pierces every brick until it hits a wall,",
@@ -276,6 +281,7 @@ public final class GameRenderer {
         for (Brick brick : world.bricks()) {
             drawBrick(gc, brick);
         }
+        drawSpecialSkillDrops(gc, world);
         drawPaddle(gc, world);
         visualEffects.renderTrails(gc);
         for (Ball ball : world.balls()) {
@@ -365,6 +371,28 @@ public final class GameRenderer {
             gc.setTextBaseline(VPos.CENTER);
             gc.fillText("+", brick.x() + brick.width() / 2, brick.y() + brick.height() / 2 + 1);
         }
+    }
+
+    private void drawSpecialSkillDrops(GraphicsContext gc, GameWorld world) {
+        double size = GameConfig.SPECIAL_SKILL_DROP_SIZE;
+        gc.save();
+        gc.setEffect(specialSkillGlow);
+        for (var drop : world.specialSkillDrops()) {
+            gc.drawImage(specialSkillImage, drop.x() - size / 2, drop.y() - size / 2, size, size);
+        }
+        gc.restore();
+    }
+
+    private static Image loadImage(String resourcePath) {
+        var resource = GameRenderer.class.getResource(resourcePath);
+        if (resource == null) {
+            throw new IllegalStateException("Missing game image resource: " + resourcePath);
+        }
+        Image image = new Image(resource.toExternalForm(), false);
+        if (image.isError()) {
+            throw new IllegalStateException("Could not load game image: " + resourcePath, image.getException());
+        }
+        return image;
     }
 
     private void drawPaddle(GraphicsContext gc, GameWorld world) {

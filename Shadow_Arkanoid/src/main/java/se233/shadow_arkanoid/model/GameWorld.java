@@ -1,7 +1,9 @@
 package se233.shadow_arkanoid.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se233.shadow_arkanoid.GameConfig;
@@ -23,7 +25,8 @@ public final class GameWorld {
             PERFECT_PARRY,
             PIERCING_DISSIPATED,
             BRICK_HIT,
-            BRICK_DESTROYED
+            BRICK_DESTROYED,
+            SPECIAL_SKILL_SLASH
         }
     }
 
@@ -31,6 +34,7 @@ public final class GameWorld {
     private final Paddle paddle = new Paddle();
     private final List<Ball> balls = new ArrayList<>();
     private final List<Brick> bricks = new ArrayList<>();
+    private final List<SpecialSkillDrop> specialSkillDrops = new ArrayList<>();
     private final List<String> events = new ArrayList<>();
     private final List<VisualCue> visualCues = new ArrayList<>();
     private final ScoreManager scoreManager = new ScoreManager();
@@ -58,6 +62,7 @@ public final class GameWorld {
         paddle.reset();
         balls.clear();
         bricks.clear();
+        specialSkillDrops.clear();
         events.clear();
         visualCues.clear();
         activeUpgrades.clear();
@@ -141,11 +146,7 @@ public final class GameWorld {
                 }
             }
             for (Brick destroyed : result.destroyedBricks()) {
-                int points = scoreManager.awardBrick(destroyed);
-                if (points > 0) {
-                    LOGGER.info("{} brick destroyed; awarded {} points", destroyed.type(), points);
-                    events.add("BRICK_DESTROYED");
-                }
+                awardDestroyedBrick(destroyed);
             }
             if (piercingBeforeStep && !ball.isPiercing()) {
                 showMessage("PIERCING ENDED", 0.8);
@@ -163,8 +164,10 @@ public final class GameWorld {
                 lostBalls.add(ball);
             }
         }
+        updateSpecialSkillDrops(dt);
         balls.removeAll(lostBalls);
         bricks.removeIf(Brick::isDestroyed);
+        specialSkillDrops.removeIf(SpecialSkillDrop::isBelowPlayfield);
         bricks.forEach(brick -> brick.update(dt));
         if (balls.isEmpty()) {
             loseLife();
@@ -247,6 +250,56 @@ public final class GameWorld {
         balls.clear();
         bricks.clear();
         visualCues.clear();
+        specialSkillDrops.clear();
+    }
+
+    public void activateSpecialSkill(double attackX) {
+        if (!Double.isFinite(attackX)) {
+            throw new IllegalArgumentException("Special skill attack position must be finite");
+        }
+        visualCues.add(new VisualCue(VisualCue.Type.SPECIAL_SKILL_SLASH, attackX,
+                (GameConfig.HUD_HEIGHT + paddle.y()) / 2));
+        int destroyedCount = 0;
+        for (Brick brick : bricks) {
+            if (attackX >= brick.x() && attackX < brick.x() + brick.width() && brick.destroy()) {
+                awardDestroyedBrick(brick);
+                destroyedCount++;
+            }
+        }
+        bricks.removeIf(Brick::isDestroyed);
+        showMessage("WIND SLASH!", 0.9);
+        LOGGER.info("Special skill slashed {} bricks at x={}", destroyedCount, attackX);
+    }
+
+    private void updateSpecialSkillDrops(double deltaTime) {
+        List<Double> collectedDrops = new ArrayList<>();
+        Iterator<SpecialSkillDrop> iterator = specialSkillDrops.iterator();
+        while (iterator.hasNext()) {
+            SpecialSkillDrop drop = iterator.next();
+            drop.update(deltaTime);
+            if (drop.isCollectedBy(paddle)) {
+                iterator.remove();
+                collectedDrops.add(drop.x());
+            } else if (drop.isBelowPlayfield()) {
+                iterator.remove();
+            }
+        }
+        for (double attackX : collectedDrops) {
+            activateSpecialSkill(attackX);
+        }
+    }
+
+    private void awardDestroyedBrick(Brick brick) {
+        int points = scoreManager.awardBrick(brick);
+        if (points <= 0) {
+            return;
+        }
+        LOGGER.info("{} brick destroyed; awarded {} points", brick.type(), points);
+        events.add("BRICK_DESTROYED");
+        if (ThreadLocalRandom.current().nextDouble() < GameConfig.SPECIAL_SKILL_DROP_CHANCE) {
+            specialSkillDrops.add(new SpecialSkillDrop(
+                    brick.x() + brick.width() / 2, brick.y() + brick.height() / 2));
+        }
     }
 
     public void selectUpgrade(int index) {
@@ -342,6 +395,7 @@ public final class GameWorld {
 
     private void loadStage() {
         bricks.clear();
+        specialSkillDrops.clear();
         bricks.addAll(stageManager.createStage(stage));
         LOGGER.info("Stage {} started with {} bricks", stage, bricks.size());
     }
@@ -356,6 +410,7 @@ public final class GameWorld {
     public Paddle paddle() { return paddle; }
     public List<Ball> balls() { return List.copyOf(balls); }
     public List<Brick> bricks() { return List.copyOf(bricks); }
+    public List<SpecialSkillDrop> specialSkillDrops() { return List.copyOf(specialSkillDrops); }
     public ScoreManager scoreManager() { return scoreManager; }
     public LifeManager lifeManager() { return lifeManager; }
     public ParrySystem parrySystem() { return parrySystem; }
