@@ -27,6 +27,13 @@ public final class GameConfig {
     public static final int BONUS_BRICK_SCORE = 300;
     public static final double BRICK_HIT_ANIMATION_SECONDS = 0.15;
     public static final double BRICK_BREAK_ANIMATION_SECONDS = 0.2;
+    public static final double SPECIAL_SKILL_DROP_CHANCE = 0.10;
+    public static final double SPECIAL_SKILL_DROP_SPEED = 280;
+    public static final double SPECIAL_SKILL_DROP_SIZE = 42;
+    public static final double SPECIAL_SKILL_SLASH_DURATION_SECONDS = 0.72;
+    public static final int WIND_SLASH_SPRITE_COLUMNS = 7;
+    public static final int WIND_SLASH_SPRITE_ROWS = 4;
+    public static final int WIND_SLASH_SPRITE_FRAME_COUNT = 27;
 
     static {
         validate();
@@ -36,7 +43,10 @@ public final class GameConfig {
         if (WIDTH <= 0 || HEIGHT <= 0 || PADDLE_WIDTH <= 0 || PADDLE_HEIGHT <= 0
                 || BALL_RADIUS <= 0 || BALL_INITIAL_SPEED <= 0 || BALL_MAX_SPEED < BALL_INITIAL_SPEED
                 || PARRY_WINDOW_SECONDS <= 0 || PARRY_COOLDOWN_SECONDS < 0
-                || STARTING_LIVES <= 0 || TOTAL_STAGES <= 0) {
+                || STARTING_LIVES <= 0 || TOTAL_STAGES <= 0
+                || SPECIAL_SKILL_DROP_CHANCE < 0 || SPECIAL_SKILL_DROP_CHANCE > 1
+                || SPECIAL_SKILL_DROP_SPEED <= 0 || SPECIAL_SKILL_DROP_SIZE <= 0
+                || SPECIAL_SKILL_SLASH_DURATION_SECONDS <= 0) {
             throw new GameConfigurationException("Game configuration contains invalid dimensions or gameplay values");
         }
     }

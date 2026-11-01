@@ -5,13 +5,54 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import se233.shadow_arkanoid.model.Ball;
+import se233.shadow_arkanoid.model.Brick;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
 import se233.shadow_arkanoid.model.Paddle;
+import se233.shadow_arkanoid.model.SpecialSkillDrop;
 import se233.shadow_arkanoid.model.system.LifeManager;
 import se233.shadow_arkanoid.model.system.ParrySystem;
 
 class ManagersTest {
+    @Test
+    void specialSkillDropChanceIsTenPercent() {
+        assertEquals(0.10, GameConfig.SPECIAL_SKILL_DROP_CHANCE);
+    }
+
+    @Test
+    void specialSkillClearsOnlyItsVerticalBrickColumn() {
+        GameWorld world = new GameWorld();
+        world.startNewGame();
+        Brick firstBrick = world.bricks().get(0);
+        double attackX = firstBrick.x() + firstBrick.width() / 2;
+        var targetColumn = world.bricks().stream()
+                .filter(brick -> attackX >= brick.x() && attackX < brick.x() + brick.width())
+                .toList();
+        int expectedScore = targetColumn.stream().mapToInt(brick -> brick.type().points()).sum();
+        int expectedBrickCount = world.bricks().size() - targetColumn.size();
+
+        world.activateSpecialSkill(attackX);
+
+        assertFalse(targetColumn.isEmpty());
+        assertTrue(targetColumn.stream().allMatch(Brick::isDestroyed));
+        assertEquals(expectedBrickCount, world.bricks().size());
+        assertEquals(expectedScore, world.scoreManager().score());
+        assertEquals(GameWorld.VisualCue.Type.SPECIAL_SKILL_SLASH,
+                world.drainVisualCues().get(0).type());
+    }
+
+    @Test
+    void specialSkillDropCanBeCaughtByPaddle() {
+        Paddle paddle = new Paddle();
+        paddle.moveTo(300);
+        SpecialSkillDrop drop = new SpecialSkillDrop(300,
+                paddle.y() - GameConfig.SPECIAL_SKILL_DROP_SIZE / 2 - 14);
+
+        drop.update(0.05);
+
+        assertTrue(drop.isCollectedBy(paddle));
+    }
+
     @Test
     void lifeLossIsBoundedAndGameOverActivatesAtZero() {
         LifeManager lives = new LifeManager(1);
