@@ -14,10 +14,16 @@ import se233.shadow_arkanoid.model.upgrade.Upgrade;
 import se233.shadow_arkanoid.model.upgrade.UpgradeManager;
 
 public final class GameWorld {
-    public record VisualCue(Type type, double x, double y) {
+    public record VisualCue(Type type, double x, double y, double width, double height, BrickType brickType) {
+        public VisualCue(Type type, double x, double y) {
+            this(type, x, y, 0, 0, null);
+        }
+
         public enum Type {
             PERFECT_PARRY,
-            PIERCING_DISSIPATED
+            PIERCING_DISSIPATED,
+            BRICK_HIT,
+            BRICK_DESTROYED
         }
     }
 
@@ -124,6 +130,10 @@ public final class GameWorld {
                 events.add("FRAME_HIT");
             }
             for (Brick hit : result.hitBricks()) {
+                visualCues.add(new VisualCue(
+                        hit.isDestroyed() ? VisualCue.Type.BRICK_DESTROYED : VisualCue.Type.BRICK_HIT,
+                        hit.x() + hit.width() / 2, hit.y() + hit.height() / 2,
+                        hit.width(), hit.height(), hit.type()));
                 if (hit.type() == BrickType.BONUS) {
                     events.add("BONUS_HIT");
                 } else {

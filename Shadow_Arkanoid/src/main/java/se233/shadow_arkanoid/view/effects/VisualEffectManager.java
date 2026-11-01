@@ -16,6 +16,7 @@ public final class VisualEffectManager {
     private final Map<Ball, BallTrail> ballTrails = new IdentityHashMap<>();
     private final List<ParryEffect> parryEffects = new ArrayList<>();
     private final List<EnergyDissipation> dissipations = new ArrayList<>();
+    private final List<BrickImpactEffect> brickImpacts = new ArrayList<>();
     private double elapsedTime;
 
     public void update(double deltaTime, List<GameWorld.VisualCue> cues, List<Ball> balls) {
@@ -24,6 +25,7 @@ public final class VisualEffectManager {
             switch (cue.type()) {
                 case PERFECT_PARRY -> parryEffects.add(new ParryEffect(cue.x(), cue.y()));
                 case PIERCING_DISSIPATED -> dissipations.add(new EnergyDissipation(cue.x(), cue.y()));
+                case BRICK_HIT, BRICK_DESTROYED -> brickImpacts.add(new BrickImpactEffect(cue));
             }
         }
 
@@ -48,6 +50,14 @@ public final class VisualEffectManager {
 
         updateEffects(parryEffects, deltaTime);
         updateEffects(dissipations, deltaTime);
+        Iterator<BrickImpactEffect> impactIterator = brickImpacts.iterator();
+        while (impactIterator.hasNext()) {
+            BrickImpactEffect impact = impactIterator.next();
+            impact.update(deltaTime);
+            if (impact.isFinished()) {
+                impactIterator.remove();
+            }
+        }
     }
 
     public void renderTrails(GraphicsContext graphics) {
@@ -62,6 +72,9 @@ public final class VisualEffectManager {
         }
         for (ParryEffect effect : parryEffects) {
             effect.render(graphics);
+        }
+        for (BrickImpactEffect impact : brickImpacts) {
+            impact.render(graphics);
         }
     }
 

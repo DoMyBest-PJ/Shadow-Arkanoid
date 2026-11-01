@@ -13,8 +13,8 @@ public final class GameConfig {
     public static final double PADDLE_HEIGHT = 22;
     public static final double PADDLE_SPEED = 560;
     public static final double BALL_RADIUS = 14;
-    public static final double BALL_INITIAL_SPEED = 550;
-    public static final double BALL_MAX_SPEED = 800;
+    public static final double BALL_INITIAL_SPEED = 800;
+    public static final double BALL_MAX_SPEED = 2000;
     public static final double MIN_VERTICAL_SPEED_RATIO = 0.22;
     public static final int STARTING_LIVES = 5;
     public static final int PARRY_BONUS = 150;
@@ -23,8 +23,10 @@ public final class GameConfig {
     public static final double PARRY_WINDOW_SECONDS = 0.125;
     public static final int TOTAL_STAGES = 5;
     public static final int BRICK_DESTROY_SCORE = 100;
-    public static final int STRONG_BRICK_SCORE = 180;
-    public static final int BONUS_BRICK_SCORE = 250;
+    public static final int STRONG_BRICK_SCORE = 200;
+    public static final int BONUS_BRICK_SCORE = 300;
+    public static final double BRICK_HIT_ANIMATION_SECONDS = 0.15;
+    public static final double BRICK_BREAK_ANIMATION_SECONDS = 0.2;
 
     static {
         validate();
