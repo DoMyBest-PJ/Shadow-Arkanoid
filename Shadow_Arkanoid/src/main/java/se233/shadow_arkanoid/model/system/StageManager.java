@@ -14,10 +14,10 @@ public final class StageManager {
         List<Brick> bricks = new ArrayList<>();
         int columns = 10;
         int rows = Math.min(4 + (stage + 1) / 2, 7);
-        double brickWidth = 78;
-        double brickHeight = 24;
+        double brickWidth = 84;
+        double brickHeight = 30;
         double gapX = 8;
-        double gapY = 9;
+        double gapY = 14;
         double totalWidth = columns * brickWidth + (columns - 1) * gapX;
         double startX = (GameConfig.WIDTH - totalWidth) / 2;
         for (int row = 0; row < rows; row++) {
@@ -27,7 +27,7 @@ public final class StageManager {
                 }
                 BrickType type = chooseType(stage, row, column);
                 bricks.add(new Brick(startX + column * (brickWidth + gapX),
-                        GameConfig.HUD_HEIGHT + 35 + row * (brickHeight + gapY),
+                        GameConfig.HUD_HEIGHT + 100 + row * (brickHeight + gapY),
                         brickWidth, brickHeight, type));
             }
         }

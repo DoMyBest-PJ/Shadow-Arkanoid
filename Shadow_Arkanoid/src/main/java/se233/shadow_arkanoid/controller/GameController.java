@@ -121,20 +121,20 @@ public final class GameController {
         }
         switch (world.state()) {
             case MAIN_MENU -> {
-                if (inside(x, y, GameRenderer.MENU_BUTTON_X, GameRenderer.MENU_START_Y,
-                        GameRenderer.MENU_BUTTON_WIDTH, GameRenderer.MENU_BUTTON_HEIGHT)) {
+                if (inside(x, y, renderer.menuButtonX(), renderer.menuStartY(),
+                        renderer.menuButtonWidth(), renderer.menuButtonHeight())) {
                     world.startNewGame();
-                } else if (inside(x, y, GameRenderer.MENU_BUTTON_X, GameRenderer.MENU_HOW_TO_PLAY_Y,
-                        GameRenderer.MENU_BUTTON_WIDTH, GameRenderer.MENU_BUTTON_HEIGHT)) {
+                } else if (inside(x, y, renderer.menuButtonX(), renderer.menuHowToPlayY(),
+                        renderer.menuButtonWidth(), renderer.menuButtonHeight())) {
                     world.showHowToPlay();
-                } else if (inside(x, y, GameRenderer.MENU_BUTTON_X, GameRenderer.MENU_EXIT_Y,
-                        GameRenderer.MENU_BUTTON_WIDTH, 48)) {
+                } else if (inside(x, y, renderer.menuButtonX(), renderer.menuExitY(),
+                        renderer.menuButtonWidth(), renderer.menuButtonHeight())) {
                     Stage stage = (Stage) canvas.getScene().getWindow();
                     stage.close();
                 }
             }
             case HOW_TO_PLAY -> {
-                if (inside(x, y, GameRenderer.HOW_TO_PLAY_BACK_X, GameRenderer.HOW_TO_PLAY_BACK_Y, 180, 44)) {
+                if (inside(x, y, renderer.howToPlayBackX(), renderer.howToPlayBackY(), 180, 44)) {
                     world.returnToMenu();
                 }
             }
@@ -178,12 +178,12 @@ public final class GameController {
 
     private boolean isOnMusicSlider(double x, double y) {
         return Math.abs(y - renderer.musicSliderY()) <= 16
-                && x >= GameRenderer.BGM_SLIDER_LEFT - 12 && x <= GameRenderer.BGM_SLIDER_RIGHT + 12;
+                && x >= renderer.musicSliderLeft() - 12 && x <= renderer.musicSliderRight() + 12;
     }
 
     private void setMusicVolumeAt(double x) {
-        double volume = (x - GameRenderer.BGM_SLIDER_LEFT)
-                / (GameRenderer.BGM_SLIDER_RIGHT - GameRenderer.BGM_SLIDER_LEFT);
+        double volume = (x - renderer.musicSliderLeft())
+                / (renderer.musicSliderRight() - renderer.musicSliderLeft());
         soundManager.setMusicVolume(Math.max(0, Math.min(1, volume)));
     }
 

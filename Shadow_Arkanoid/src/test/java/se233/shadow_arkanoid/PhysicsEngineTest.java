@@ -27,6 +27,17 @@ class PhysicsEngineTest {
     }
 
     @Test
+    void ballCannotEnterHudArea() {
+        Ball ball = new Ball(200, GameConfig.HUD_HEIGHT + GameConfig.BALL_RADIUS + 1,
+                0, -100, GameConfig.BALL_RADIUS);
+
+        physics.update(ball, paddle, List.of(), 0.1);
+
+        assertTrue(ball.y() >= GameConfig.HUD_HEIGHT + ball.radius());
+        assertTrue(ball.velocityY() > 0);
+    }
+
+    @Test
     void ballReflectsFromRightWall() {
         Ball ball = new Ball(GameConfig.WIDTH - 7, 200, 100, 0, 5);
         physics.update(ball, paddle, List.of(), 0.1);
@@ -43,9 +54,9 @@ class PhysicsEngineTest {
 
     @Test
     void piercingDestroysBricksWithoutReversingOrEndingOnBrickContact() {
-        Ball ball = new Ball(110, 100, 0, 200, 5);
+        Ball ball = new Ball(110, 200, 0, 200, 5);
         ball.setPiercing(true);
-        Brick brick = new Brick(90, 120, 40, 14, BrickType.NORMAL);
+        Brick brick = new Brick(90, 220, 40, 14, BrickType.NORMAL);
         PhysicsEngine.BallResult result = physics.update(ball, paddle, List.of(brick), 0.2);
         assertTrue(brick.isDestroyed());
         assertEquals(200, ball.velocityY(), 0.0001);
@@ -55,8 +66,8 @@ class PhysicsEngineTest {
 
     @Test
     void normalBrickCollisionReflectsAndSeparatesTheBall() {
-        Ball ball = new Ball(110, 100, 0, 200, 5);
-        Brick brick = new Brick(90, 120, 40, 14, BrickType.NORMAL);
+        Ball ball = new Ball(110, 200, 0, 200, 5);
+        Brick brick = new Brick(90, 220, 40, 14, BrickType.NORMAL);
         physics.update(ball, paddle, List.of(brick), 0.2);
         assertTrue(brick.isDestroyed());
         assertTrue(ball.velocityY() < 0);

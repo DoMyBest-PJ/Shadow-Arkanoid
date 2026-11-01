@@ -82,8 +82,8 @@ public final class PhysicsEngine {
                 }
                 wallHit = true;
             }
-            if (ball.y() < ball.radius()) {
-                ball.setPosition(ball.x(), ball.radius());
+            if (ball.y() < GameConfig.HUD_HEIGHT + ball.radius()) {
+                ball.setPosition(ball.x(), GameConfig.HUD_HEIGHT + ball.radius());
                 if (ball.velocityY() < 0) {
                     ball.setVelocity(ball.velocityX(), -ball.velocityY());
                 }

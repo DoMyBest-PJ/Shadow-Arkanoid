@@ -120,6 +120,9 @@ public final class GameWorld {
         for (Ball ball : balls) {
             boolean piercingBeforeStep = ball.isPiercing();
             PhysicsEngine.BallResult result = physicsEngine.update(ball, paddle, bricks, dt);
+            if (result.wallHit()) {
+                events.add("FRAME_HIT");
+            }
             for (Brick hit : result.hitBricks()) {
                 if (hit.type() == BrickType.BONUS) {
                     events.add("BONUS_HIT");

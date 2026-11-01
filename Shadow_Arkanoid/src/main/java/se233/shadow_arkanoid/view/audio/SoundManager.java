@@ -40,6 +40,10 @@ public final class SoundManager implements AutoCloseable {
                     "/se233/shadow_arkanoid/assets/sound/Block1.mp4",
                     "/se233/shadow_arkanoid/assets/sound/Block2.mp4"),
 
+            "FRAME_HIT", List.of(
+                    "/se233/shadow_arkanoid/assets/sound/Wood_hit1.ogg",
+                    "/se233/shadow_arkanoid/assets/sound/Wood_hit2.mp3"),
+
             "UPGRADE_SELECTED", List.of("/se233/shadow_arkanoid/assets/audio/upgrade.mp3"));
 
     private static final Map<String, String> MUSIC_ASSETS = Map.of(

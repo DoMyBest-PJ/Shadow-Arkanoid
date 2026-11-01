@@ -11,7 +11,7 @@ import se233.shadow_arkanoid.model.GameState;
 public final class GameViewport extends Pane {
     private final ImageView frameImage;
     private final Canvas gameplayCanvas;
-    private boolean mainMenu = true;
+    private boolean menuView = true;
 
     public GameViewport(Canvas gameplayCanvas) {
         this.gameplayCanvas = gameplayCanvas;
@@ -41,17 +41,17 @@ public final class GameViewport extends Pane {
     }
 
     public void showState(GameState state) {
-        boolean showMenu = state == GameState.MAIN_MENU;
-        if (mainMenu != showMenu) {
-            mainMenu = showMenu;
-            frameImage.setVisible(!mainMenu);
+        boolean showMenuView = state == GameState.MAIN_MENU || state == GameState.HOW_TO_PLAY;
+        if (menuView != showMenuView) {
+            menuView = showMenuView;
+            frameImage.setVisible(!menuView);
             requestLayout();
         }
     }
 
     @Override
     protected void layoutChildren() {
-        if (mainMenu) {
+        if (menuView) {
             gameplayCanvas.setWidth(getWidth());
             gameplayCanvas.setHeight(getHeight());
             gameplayCanvas.relocate(0, 0);
