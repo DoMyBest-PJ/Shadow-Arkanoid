@@ -13,7 +13,7 @@ public final class GameConfig {
     public static final double PADDLE_HEIGHT = 22;
     public static final double PADDLE_SPEED = 560;
     public static final double BALL_RADIUS = 14;
-    public static final double BALL_INITIAL_SPEED = 500;
+    public static final double BALL_INITIAL_SPEED = 550;
     public static final double BALL_MAX_SPEED = 800;
     public static final double MIN_VERTICAL_SPEED_RATIO = 0.22;
     public static final int STARTING_LIVES = 5;
