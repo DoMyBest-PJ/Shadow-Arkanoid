@@ -256,7 +256,7 @@ public final class GameRenderer {
                     ball.x(), ball.y());
         }
         gc.setEffect(ball.isPiercing() ? new DropShadow(20, MAGENTA) : ballGlow);
-        gc.setFill(ball.isPiercing() ? Color.web("#ff9de7") : Color.WHITE);
+        gc.setFill(ball.isPiercing() ? Color.web("#c42e14") : Color.WHITE);
         gc.fillOval(ball.x() - ball.radius(), ball.y() - ball.radius(), ball.radius() * 2, ball.radius() * 2);
         gc.setEffect(null);
     }
