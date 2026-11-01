@@ -15,8 +15,7 @@ public final class UpgradeManager {
 
     public UpgradeManager(Random random) {
         this.random = random;
-        upgrades = List.of(new ExtendedPaddleUpgrade(), new ExtraLifeUpgrade(), new MultiBallUpgrade(),
-                new BonusScoreUpgrade(), new SpeedControlUpgrade(), new ParryMasteryUpgrade());
+        upgrades = List.of(new ExtendedPaddleUpgrade());
     }
 
     public List<Upgrade> choose(int count) {

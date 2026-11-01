@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import se233.shadow_arkanoid.view.GameRenderer;
 import se233.shadow_arkanoid.model.Brick;
 import se233.shadow_arkanoid.model.Paddle;
 import se233.shadow_arkanoid.model.system.StageManager;
@@ -47,5 +48,14 @@ class FrameLayoutTest {
         assertTrue(paddle.right() <= GameConfig.WIDTH);
         paddle.move(-1, 10);
         assertTrue(paddle.left() >= 0);
+    }
+    @Test
+    void katanaPaddleSpriteSheetIsPackagedAndConfiguredCorrectly() {
+        assertNotNull(GameRenderer.class.getResource("/se233/shadow_arkanoid/assets/picture/katana_paddle_spriteSheet.png"));
+        assertEquals(12, GameConfig.KATANA_PADDLE_SPRITE_FRAME_COUNT);
+        assertEquals(4, GameConfig.KATANA_PADDLE_SPRITE_COLUMNS);
+        assertEquals(3, GameConfig.KATANA_PADDLE_SPRITE_ROWS);
+        assertEquals(288, GameConfig.KATANA_PADDLE_SPRITE_FRAME_WIDTH);
+        assertEquals(48, GameConfig.KATANA_PADDLE_SPRITE_FRAME_HEIGHT);
     }
 }

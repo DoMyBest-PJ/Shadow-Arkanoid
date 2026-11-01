@@ -148,10 +148,10 @@ class ManagersTest {
         ball.setPosition(world.paddle().centerX(), GameConfig.HEIGHT + 20);
         ball.setVelocity(0, 100);
         world.update(0.01, 0);
-        assertEquals(2, world.lifeManager().lives());
+        assertEquals(GameConfig.STARTING_LIVES - 1, world.lifeManager().lives());
         assertEquals(GameState.LIFE_LOST, world.state());
         world.update(0.05, 0);
-        assertEquals(2, world.lifeManager().lives());
+        assertEquals(GameConfig.STARTING_LIVES - 1, world.lifeManager().lives());
     }
 
     @Test
