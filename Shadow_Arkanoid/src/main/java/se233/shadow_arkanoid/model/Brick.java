@@ -1,6 +1,7 @@
 package se233.shadow_arkanoid.model;
 
 import javafx.geometry.Rectangle2D;
+import se233.shadow_arkanoid.GameConfig;
 
 public final class Brick {
     private final double x;
@@ -30,7 +31,7 @@ public final class Brick {
             return;
         }
         durability--;
-        hitFlash = 0.12;
+        hitFlash = GameConfig.BRICK_HIT_ANIMATION_SECONDS;
         if (durability <= 0) {
             destroyed = true;
         }

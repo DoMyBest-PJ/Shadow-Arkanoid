@@ -15,6 +15,9 @@ class BrickTest {
         brick.hit();
         assertEquals(1, brick.durability());
         assertFalse(brick.isDestroyed());
+        assertEquals(GameConfig.BRICK_HIT_ANIMATION_SECONDS, brick.hitFlash());
+        brick.update(GameConfig.BRICK_HIT_ANIMATION_SECONDS / 2);
+        assertEquals(GameConfig.BRICK_HIT_ANIMATION_SECONDS / 2, brick.hitFlash(), 0.0001);
         brick.hit();
         assertTrue(brick.isDestroyed());
     }

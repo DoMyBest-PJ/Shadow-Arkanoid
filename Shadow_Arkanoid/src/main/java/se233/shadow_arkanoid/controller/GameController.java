@@ -13,12 +13,14 @@ import se233.shadow_arkanoid.GameConfig;
 import se233.shadow_arkanoid.model.GameState;
 import se233.shadow_arkanoid.model.GameWorld;
 import se233.shadow_arkanoid.view.GameRenderer;
+import se233.shadow_arkanoid.view.GameViewport;
 import se233.shadow_arkanoid.view.audio.SoundManager;
 
 public final class GameController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
     private final Canvas canvas;
     private final GameRenderer renderer;
+    private final GameViewport viewport;
     private final SoundManager soundManager;
     private final GameWorld world = new GameWorld();
     private final EnumSet<KeyCode> pressedKeys = EnumSet.noneOf(KeyCode.class);
@@ -26,9 +28,10 @@ public final class GameController {
     private long previousFrame;
     private boolean adjustingMusicVolume;
 
-    public GameController(Canvas canvas, GameRenderer renderer, SoundManager soundManager) {
+    public GameController(Canvas canvas, GameRenderer renderer, GameViewport viewport, SoundManager soundManager) {
         this.canvas = canvas;
         this.renderer = renderer;
+        this.viewport = viewport;
         this.soundManager = soundManager;
     }
 
@@ -66,7 +69,10 @@ public final class GameController {
                 previousFrame = now;
                 double direction = (pressedKeys.contains(KeyCode.D) || pressedKeys.contains(KeyCode.RIGHT) ? 1 : 0)
                         - (pressedKeys.contains(KeyCode.A) || pressedKeys.contains(KeyCode.LEFT) ? 1 : 0);
-                world.update(Math.min(deltaTime, 0.05), direction);
+                double frameTime = Math.min(deltaTime, 0.05);
+                world.update(frameTime, direction);
+                renderer.updateEffects(frameTime, world.drainVisualCues(), world.balls());
+                viewport.showState(world.state());
                 syncMusicWithGameState();
                 for (String event : world.drainEvents()) {
                     soundManager.play(event);
@@ -115,43 +121,46 @@ public final class GameController {
         }
         switch (world.state()) {
             case MAIN_MENU -> {
-                if (inside(x, y, 380, 310, 200, 52)) {
+                if (inside(x, y, renderer.menuButtonX(), renderer.menuStartY(),
+                        renderer.menuButtonWidth(), renderer.menuButtonHeight())) {
                     world.startNewGame();
-                } else if (inside(x, y, 380, 382, 200, 52)) {
+                } else if (inside(x, y, renderer.menuButtonX(), renderer.menuHowToPlayY(),
+                        renderer.menuButtonWidth(), renderer.menuButtonHeight())) {
                     world.showHowToPlay();
-                } else if (inside(x, y, 380, 454, 200, 48)) {
+                } else if (inside(x, y, renderer.menuButtonX(), renderer.menuExitY(),
+                        renderer.menuButtonWidth(), renderer.menuButtonHeight())) {
                     Stage stage = (Stage) canvas.getScene().getWindow();
                     stage.close();
                 }
             }
             case HOW_TO_PLAY -> {
-                if (inside(x, y, 390, 555, 180, 44)) {
+                if (inside(x, y, renderer.howToPlayBackX(), renderer.howToPlayBackY(), 180, 44)) {
                     world.returnToMenu();
                 }
             }
             case READY -> world.launch();
             case PAUSED -> {
-                if (inside(x, y, 370, 310, 220, 48)) {
+                if (inside(x, y, GameRenderer.PAUSE_BUTTON_X, GameRenderer.PAUSE_RESUME_Y, 220, 48)) {
                     world.pause();
-                } else if (inside(x, y, 370, 370, 220, 48)) {
+                } else if (inside(x, y, GameRenderer.PAUSE_BUTTON_X, GameRenderer.PAUSE_MENU_Y, 220, 48)) {
                     world.returnToMenu();
                 }
             }
             case UPGRADE_SELECTION -> {
-                double cardWidth = 250;
-                double gap = 22;
+                double cardWidth = GameRenderer.UPGRADE_CARD_WIDTH;
+                double gap = GameRenderer.UPGRADE_CARD_GAP;
                 double start = (GameConfig.WIDTH - (cardWidth * 3 + gap * 2)) / 2;
                 for (int i = 0; i < world.upgradeChoices().size(); i++) {
-                    if (inside(x, y, start + i * (cardWidth + gap), 235, cardWidth, 230)) {
+                    if (inside(x, y, start + i * (cardWidth + gap), GameRenderer.UPGRADE_CARD_Y, cardWidth, 230)) {
                         world.selectUpgrade(i);
                         return;
                     }
                 }
             }
             case GAME_OVER, VICTORY -> {
-                if (inside(x, y, 365, 375, 230, 48)) {
+                if (inside(x, y, GameRenderer.END_BUTTON_X, GameRenderer.END_PLAY_AGAIN_Y, 230, 48)) {
                     world.startNewGame();
-                } else if (inside(x, y, 365, 435, 230, 44)) {
+                } else if (inside(x, y, GameRenderer.END_BUTTON_X, GameRenderer.END_MENU_Y, 230, 44)) {
                     world.returnToMenu();
                 }
             }
@@ -168,13 +177,13 @@ public final class GameController {
     }
 
     private boolean isOnMusicSlider(double x, double y) {
-        return Math.abs(y - GameRenderer.BGM_SLIDER_Y) <= 16
-                && x >= GameRenderer.BGM_SLIDER_LEFT - 12 && x <= GameRenderer.BGM_SLIDER_RIGHT + 12;
+        return Math.abs(y - renderer.musicSliderY()) <= 16
+                && x >= renderer.musicSliderLeft() - 12 && x <= renderer.musicSliderRight() + 12;
     }
 
     private void setMusicVolumeAt(double x) {
-        double volume = (x - GameRenderer.BGM_SLIDER_LEFT)
-                / (GameRenderer.BGM_SLIDER_RIGHT - GameRenderer.BGM_SLIDER_LEFT);
+        double volume = (x - renderer.musicSliderLeft())
+                / (renderer.musicSliderRight() - renderer.musicSliderLeft());
         soundManager.setMusicVolume(Math.max(0, Math.min(1, volume)));
     }
 

@@ -1,31 +1,39 @@
 package se233.shadow_arkanoid.model.system;
 
+import java.util.Optional;
 import se233.shadow_arkanoid.GameConfig;
 import se233.shadow_arkanoid.model.Ball;
 import se233.shadow_arkanoid.model.Paddle;
 
 public final class ParrySystem {
+    public record Impact(double x, double y) {
+    }
+
     private double cooldownRemaining;
     private double timingWindow = GameConfig.PARRY_WINDOW_SECONDS;
 
     public boolean attempt(Ball ball, Paddle paddle) {
+        return tryParry(ball, paddle).isPresent();
+    }
+
+    public Optional<Impact> tryParry(Ball ball, Paddle paddle) {
         if (cooldownRemaining > 0 || ball.isAttached() || ball.velocityY() <= 0) {
-            return false;
+            return Optional.empty();
         }
         double collisionY = paddle.y() - ball.radius();
         double timeToPaddle = (collisionY - ball.y()) / ball.velocityY();
         if (timeToPaddle < 0 || timeToPaddle > timingWindow) {
-            return false;
+            return Optional.empty();
         }
         double predictedX = reflectedX(ball.x() + ball.velocityX() * timeToPaddle, ball.radius());
         double paddlePrediction = paddle.centerX();
         if (Math.abs(predictedX - paddlePrediction) > paddle.width() / 2 + ball.radius()) {
-            return false;
+            return Optional.empty();
         }
         ball.scaleSpeed(GameConfig.PARRY_SPEED_MULTIPLIER, GameConfig.BALL_MAX_SPEED);
         ball.setPiercing(true);
         cooldownRemaining = GameConfig.PARRY_COOLDOWN_SECONDS;
-        return true;
+        return Optional.of(new Impact(predictedX, collisionY));
     }
 
     public void update(double deltaTime) {

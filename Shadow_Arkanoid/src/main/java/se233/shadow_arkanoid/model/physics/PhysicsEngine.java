@@ -9,7 +9,7 @@ import se233.shadow_arkanoid.model.Paddle;
 
 public final class PhysicsEngine {
     public record BallResult(List<Brick> hitBricks, List<Brick> destroyedBricks,
-                             boolean wallHit, boolean paddleHit, boolean lost) {
+                             boolean wallHit, double wallX, double wallY, boolean paddleHit, boolean lost) {
     }
 
     public BallResult update(Ball ball, Paddle paddle, List<Brick> bricks, double deltaTime) {
@@ -19,6 +19,8 @@ public final class PhysicsEngine {
         List<Brick> hitBricks = new ArrayList<>();
         List<Brick> destroyedBricks = new ArrayList<>();
         boolean wallHit = false;
+        double wallX = Double.NaN;
+        double wallY = Double.NaN;
         boolean paddleHit = false;
         int substeps = Math.max(1, (int) Math.ceil(ball.speed() * deltaTime / Math.max(2, ball.radius() * 0.45)));
         double step = substeps == 0 ? 0 : deltaTime / substeps;
@@ -63,6 +65,10 @@ public final class PhysicsEngine {
                     ball.setVelocity(-ball.velocityX(), ball.velocityY());
                 }
                 preventHorizontalTrap(ball);
+                if (!wallHit) {
+                    wallX = ball.x();
+                    wallY = ball.y();
+                }
                 wallHit = true;
             } else if (ball.x() > maxX) {
                 ball.setPosition(maxX, ball.y());
@@ -70,6 +76,10 @@ public final class PhysicsEngine {
                     ball.setVelocity(-ball.velocityX(), ball.velocityY());
                 }
                 preventHorizontalTrap(ball);
+                if (!wallHit) {
+                    wallX = ball.x();
+                    wallY = ball.y();
+                }
                 wallHit = true;
             }
             if (ball.y() < GameConfig.HUD_HEIGHT + ball.radius()) {
@@ -78,6 +88,10 @@ public final class PhysicsEngine {
                     ball.setVelocity(ball.velocityX(), -ball.velocityY());
                 }
                 preventHorizontalTrap(ball);
+                if (!wallHit) {
+                    wallX = ball.x();
+                    wallY = ball.y();
+                }
                 wallHit = true;
             }
 
@@ -95,10 +109,10 @@ public final class PhysicsEngine {
                 paddleHit = true;
             }
             if (ball.y() - ball.radius() > GameConfig.HEIGHT) {
-                return new BallResult(hitBricks, destroyedBricks, wallHit, paddleHit, true);
+                return new BallResult(hitBricks, destroyedBricks, wallHit, wallX, wallY, paddleHit, true);
             }
         }
-        return new BallResult(hitBricks, destroyedBricks, wallHit, paddleHit, false);
+        return new BallResult(hitBricks, destroyedBricks, wallHit, wallX, wallY, paddleHit, false);
     }
 
     public static boolean circleIntersects(double x, double y, double radius, Brick brick) {

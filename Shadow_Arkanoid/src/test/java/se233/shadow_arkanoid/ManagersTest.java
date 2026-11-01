@@ -27,12 +27,50 @@ class ManagersTest {
         world.startNewGame();
         world.launch();
         Ball ball = world.balls().get(0);
-        ball.setPosition(world.paddle().centerX(), 550);
+        ball.setPosition(world.paddle().centerX(), world.paddle().y() - ball.radius() - 8);
         ball.setVelocity(0, 88);
         assertTrue(world.attemptParry());
         assertEquals(GameConfig.PARRY_BONUS, world.scoreManager().score());
         assertTrue(ball.speed() > 88);
         assertTrue(ball.isPiercing());
+    }
+
+    @Test
+    void perfectParryEmitsImpactAtPredictedPaddleContact() {
+        GameWorld world = new GameWorld();
+        world.startNewGame();
+        world.launch();
+        Ball ball = world.balls().get(0);
+        ball.setPosition(world.paddle().centerX() - 6, world.paddle().y() - ball.radius() - 8);
+        ball.setVelocity(48, 88);
+        double timeToPaddle = (world.paddle().y() - ball.radius() - ball.y()) / ball.velocityY();
+        double expectedImpactX = ball.x() + ball.velocityX() * timeToPaddle;
+
+        assertTrue(world.attemptParry());
+
+        GameWorld.VisualCue cue = world.drainVisualCues().get(0);
+        assertEquals(GameWorld.VisualCue.Type.PERFECT_PARRY, cue.type());
+        assertEquals(expectedImpactX, cue.x(), 0.0001);
+        assertEquals(world.paddle().y() - ball.radius(), cue.y(), 0.0001);
+    }
+
+    @Test
+    void piercingWallHitEmitsDissipationAtBoundaryContact() {
+        GameWorld world = new GameWorld();
+        world.startNewGame();
+        world.launch();
+        Ball ball = world.balls().get(0);
+        ball.setPiercing(true);
+        ball.setPosition(GameConfig.WALL_MARGIN + ball.radius() + 1, 200);
+        ball.setVelocity(-100, 0);
+
+        world.update(0.1, 0);
+
+        GameWorld.VisualCue cue = world.drainVisualCues().get(0);
+        assertEquals(GameWorld.VisualCue.Type.PIERCING_DISSIPATED, cue.type());
+        assertEquals(GameConfig.WALL_MARGIN + ball.radius(), cue.x(), 0.0001);
+        assertEquals(200, cue.y(), 0.0001);
+        assertFalse(ball.isPiercing());
     }
 
     @Test
@@ -54,7 +92,8 @@ class ManagersTest {
     void cooldownPreventsRepeatedParryAttempts() {
         ParrySystem parry = new ParrySystem();
         Paddle paddle = new Paddle();
-        Ball ball = new Ball(paddle.centerX(), 550, 0, 88, GameConfig.BALL_RADIUS);
+        Ball ball = new Ball(paddle.centerX(), paddle.y() - GameConfig.BALL_RADIUS - 8,
+                0, 88, GameConfig.BALL_RADIUS);
         assertTrue(parry.attempt(ball, paddle));
         assertFalse(parry.attempt(ball, paddle));
     }
