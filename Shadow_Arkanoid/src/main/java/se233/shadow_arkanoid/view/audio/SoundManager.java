@@ -17,19 +17,35 @@ import org.slf4j.LoggerFactory;
 public final class SoundManager implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SoundManager.class);
     private static final Map<String, List<String>> ASSETS = Map.of(
-            "LIFE_LOST", List.of("/se233/shadow_arkanoid/assets/sound/LiveDrop.mp3"),
+            "LIFE_LOST", List.of(
+                    "/se233/shadow_arkanoid/assets/sound/livedrop1.mp4",
+                    "/se233/shadow_arkanoid/assets/sound/livedrop2.mp4",
+                    "/se233/shadow_arkanoid/assets/sound/livedrop3.mp4"),
+
             "STAGE_COMPLETE", List.of("/se233/shadow_arkanoid/assets/sound/Stage-Finish.mp3"),
+
             "PARRY_SUCCESS", List.of(
                     "/se233/shadow_arkanoid/assets/sound/Parry1.mp4",
                     "/se233/shadow_arkanoid/assets/sound/Parry2.mp4"),
-            "BRICK_HIT", List.of("/se233/shadow_arkanoid/assets/audio/Block1.mp3"),
-            "BRICK_DESTROYED", List.of("/se233/shadow_arkanoid/assets/audio/Block2.mp3"),
-            "PADDLE_HIT", List.of("/se233/shadow_arkanoid/assets/audio/paddle-hit.mp3"),
-            "PIERCING_ENDED", List.of("/se233/shadow_arkanoid/assets/audio/piercing-end.mp3"),
+
+            "BRICK_HIT", List.of(
+                    "/se233/shadow_arkanoid/assets/sound/blockhit1.mp3",
+                    "/se233/shadow_arkanoid/assets/sound/blockhit2.mp3"),
+
+            "BRICK_DESTROYED", List.of(
+                    "/se233/shadow_arkanoid/assets/sound/blockbreak1.mp3",
+                    "/se233/shadow_arkanoid/assets/sound/blockbreak2.mp3"),
+
+            "PADDLE_HIT", List.of(
+                    "/se233/shadow_arkanoid/assets/sound/Block1.mp4",
+                    "/se233/shadow_arkanoid/assets/sound/Block2.mp4"),
+
             "UPGRADE_SELECTED", List.of("/se233/shadow_arkanoid/assets/audio/upgrade.mp3"));
+
     private static final Map<String, String> MUSIC_ASSETS = Map.of(
             "BGM_START", "/se233/shadow_arkanoid/assets/sound/bgm-start.mp3",
             "BGM_INGAME", "/se233/shadow_arkanoid/assets/sound/bgm-ingame.mp3");
+
     private static final double DEFAULT_MUSIC_VOLUME = 0.25;
     private final Map<String, List<AudioClip>> clips = new ConcurrentHashMap<>();
     private final Map<String, Media> musicTracks = new ConcurrentHashMap<>();

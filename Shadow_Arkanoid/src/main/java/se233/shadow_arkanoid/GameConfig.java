@@ -16,7 +16,7 @@ public final class GameConfig {
     public static final double BALL_INITIAL_SPEED = 450;
     public static final double BALL_MAX_SPEED = 760;
     public static final double MIN_VERTICAL_SPEED_RATIO = 0.22;
-    public static final int STARTING_LIVES = 3;
+    public static final int STARTING_LIVES = 5;
     public static final int PARRY_BONUS = 100;
     public static final double PARRY_SPEED_MULTIPLIER = 1.25;
     public static final double PARRY_COOLDOWN_SECONDS = 1.5;
