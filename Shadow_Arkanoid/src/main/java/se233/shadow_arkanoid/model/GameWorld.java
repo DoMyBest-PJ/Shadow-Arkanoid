@@ -259,6 +259,7 @@ public final class GameWorld {
         }
         visualCues.add(new VisualCue(VisualCue.Type.SPECIAL_SKILL_SLASH, attackX,
                 (GameConfig.HUD_HEIGHT + paddle.y()) / 2));
+        events.add("WIND_SLASH");
         int destroyedCount = 0;
         for (Brick brick : bricks) {
             if (attackX >= brick.x() && attackX < brick.x() + brick.width() && brick.destroy()) {
