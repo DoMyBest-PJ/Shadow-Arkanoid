@@ -37,6 +37,9 @@ public final class GameRenderer {
     private static final double MENU_BUTTON_GAP_RATIO = 0.09;
     private static final double HOW_TO_PLAY_BACK_WIDTH = 180;
     private static final double HOW_TO_PLAY_BACK_HEIGHT = 44;
+    private static final int STAGE_BACKGROUND_COLUMNS = 5;
+    private static final String STAGE_BACKGROUND_RESOURCE =
+            "/se233/shadow_arkanoid/assets/picture/stageBG.png";
     public static final double PAUSE_BUTTON_X = (GameConfig.WIDTH - 220) / 2;
     public static final double PAUSE_RESUME_Y = GameConfig.HEIGHT / 2 - 26;
     public static final double PAUSE_MENU_Y = GameConfig.HEIGHT / 2 + 34;
@@ -63,6 +66,7 @@ public final class GameRenderer {
     private final DropShadow ballGlow = new DropShadow(18, Color.web("#65edff"));
     private final DropShadow energyBallGlow = new DropShadow(23, Color.web("#ff7614"));
     private final DropShadow specialSkillGlow = new DropShadow(12, Color.web("#ff857d"));
+    private final Image stageBackgroundSpriteSheet = loadStageBackgroundSpriteSheet();
     private final Image specialSkillImage = loadImage(
             "/se233/shadow_arkanoid/assets/picture/special_skill.png");
     private final Image katanaPaddleSpriteSheet = loadKatanaPaddleSpriteSheet();
@@ -282,6 +286,7 @@ public final class GameRenderer {
     }
 
     private void drawGame(GraphicsContext gc, GameWorld world) {
+        drawStageBackground(gc, world.stage());
         drawHud(gc, world);
         for (Brick brick : world.bricks()) {
             drawBrick(gc, brick);
@@ -303,6 +308,14 @@ public final class GameRenderer {
         }
         drawStatus(gc, world);
         visualEffects.renderEffects(gc);
+    }
+
+    private void drawStageBackground(GraphicsContext gc, int stage) {
+        int stageIndex = Math.clamp(stage - 1, 0, STAGE_BACKGROUND_COLUMNS - 1);
+        double frameWidth = stageBackgroundSpriteSheet.getWidth() / STAGE_BACKGROUND_COLUMNS;
+        gc.drawImage(stageBackgroundSpriteSheet,
+                stageIndex * frameWidth, 0, frameWidth, GameConfig.HEIGHT,
+                0, 0, GameConfig.WIDTH, GameConfig.HEIGHT);
     }
 
     private void drawHud(GraphicsContext gc, GameWorld world) {
@@ -351,9 +364,9 @@ public final class GameRenderer {
 
     private void drawBrick(GraphicsContext gc, Brick brick) {
         Color color = switch (brick.type()) {
-            case NORMAL -> Color.web("#42bfff");
-            case STRONG -> brick.durability() == 2 ? Color.web("#b46bff") : Color.web("#e0a1ff");
-            case BONUS -> Color.web("#ffc34f");
+            case NORMAL -> Color.web("#A8FF00");
+            case STRONG -> brick.durability() == 2 ? Color.web("#FF3B30") : Color.web("#A8FF00");
+            case BONUS -> Color.web("#FFD400");
         };
         if (brick.hitFlash() > 0) color = Color.WHITE;
         gc.setFill(color.deriveColor(0, 0.78, 0.72, 1));
@@ -362,14 +375,10 @@ public final class GameRenderer {
         gc.fillRoundRect(brick.x() + 2, brick.y() + 2, brick.width() - 4, brick.height() - 5, 7, 7);
         gc.setFill(Color.rgb(255, 255, 255, 0.35));
         gc.fillRoundRect(brick.x() + 5, brick.y() + 4, brick.width() - 10, 4, 4, 4);
-        if (brick.type() == BrickType.STRONG) {
-            gc.setFill(Color.web("#201537"));
-            gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 18));
-            gc.setTextAlign(TextAlignment.CENTER);
-            gc.setTextBaseline(VPos.CENTER);
-            gc.fillText(Integer.toString(brick.durability()), brick.x() + brick.width() / 2,
-                    brick.y() + brick.height() / 2 + 2);
-        } else if (brick.type() == BrickType.BONUS) {
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(2);
+        gc.strokeRoundRect(brick.x(), brick.y(), brick.width(), brick.height(), 9, 9);
+        if (brick.type() == BrickType.BONUS) {
             gc.setFill(Color.web("#462d00"));
             gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 18));
             gc.setTextAlign(TextAlignment.CENTER);
@@ -400,6 +409,16 @@ public final class GameRenderer {
         return image;
     }
 
+    private static Image loadStageBackgroundSpriteSheet() {
+        Image image = loadImage(STAGE_BACKGROUND_RESOURCE);
+        if (image.getWidth() != GameConfig.WIDTH * STAGE_BACKGROUND_COLUMNS
+                || image.getHeight() != GameConfig.HEIGHT) {
+            throw new IllegalStateException("Unexpected stage background dimensions: "
+                    + image.getWidth() + "x" + image.getHeight());
+        }
+        return image;
+    }
+
     private static Image loadKatanaPaddleSpriteSheet() {
         var resource = GameRenderer.class.getResource(
                 "/se233/shadow_arkanoid/assets/picture/katana_paddle_spriteSheet.png");
@@ -421,6 +440,16 @@ public final class GameRenderer {
 
     private void drawPaddle(GraphicsContext gc, GameWorld world) {
         Paddle paddle = world.paddle();
+        double baseX = paddle.left() - 6;
+        double baseY = paddle.y() - 4;
+        double baseWidth = paddle.width() + 12;
+        double baseHeight = paddle.height() + 10;
+        gc.setFill(Color.rgb(3, 10, 24, 0.92));
+        gc.fillRoundRect(baseX, baseY, baseWidth, baseHeight, 14, 14);
+        gc.setStroke(CYAN);
+        gc.setLineWidth(2.5);
+        gc.strokeRoundRect(baseX, baseY, baseWidth, baseHeight, 14, 14);
+
         if (katanaPaddleSpriteSheet != null) {
             double cycleTime = visualEffects.elapsedTime() % GameConfig.KATANA_PADDLE_ANIMATION_CYCLE_SECONDS;
             int frameIndex = (int) ((cycleTime / GameConfig.KATANA_PADDLE_ANIMATION_CYCLE_SECONDS)
@@ -473,6 +502,9 @@ public final class GameRenderer {
             gc.setFill(ENERGY_BALL);
             gc.fillOval(ball.x() - radius, ball.y() - radius, diameter, diameter);
             gc.setEffect(null);
+            gc.setStroke(Color.BLACK);
+            gc.setLineWidth(1.5);
+            gc.strokeOval(ball.x() - radius, ball.y() - radius, diameter, diameter);
             gc.restore();
         }
         if (energy < 1) {
@@ -482,6 +514,9 @@ public final class GameRenderer {
             gc.setFill(Color.WHITE);
             gc.fillOval(ball.x() - radius, ball.y() - radius, diameter, diameter);
             gc.setEffect(null);
+            gc.setStroke(Color.BLACK);
+            gc.setLineWidth(1.5);
+            gc.strokeOval(ball.x() - radius, ball.y() - radius, diameter, diameter);
             gc.restore();
         }
     }

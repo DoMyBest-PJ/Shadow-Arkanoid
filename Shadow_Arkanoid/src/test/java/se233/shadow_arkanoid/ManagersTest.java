@@ -39,6 +39,7 @@ class ManagersTest {
         assertEquals(expectedScore, world.scoreManager().score());
         assertEquals(GameWorld.VisualCue.Type.SPECIAL_SKILL_SLASH,
                 world.drainVisualCues().get(0).type());
+        assertTrue(world.drainEvents().contains("WIND_SLASH"));
     }
 
     @Test

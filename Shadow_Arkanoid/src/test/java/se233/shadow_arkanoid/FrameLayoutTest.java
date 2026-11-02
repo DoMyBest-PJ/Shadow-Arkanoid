@@ -3,6 +3,9 @@ package se233.shadow_arkanoid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import se233.shadow_arkanoid.view.GameRenderer;
 import se233.shadow_arkanoid.model.Brick;
@@ -13,6 +16,18 @@ class FrameLayoutTest {
     @Test
     void frameImageIsPackagedAtItsExistingResourcePath() {
         assertNotNull(FrameLayout.class.getResource(FrameLayout.IMAGE_RESOURCE));
+    }
+
+    @Test
+    void stageBackgroundSpriteSheetHasFiveGameplaySizeFrames() throws IOException {
+        var imageUrl = GameRenderer.class.getResource(
+                "/se233/shadow_arkanoid/assets/picture/stageBG.png");
+        assertNotNull(imageUrl);
+
+        BufferedImage image = ImageIO.read(imageUrl);
+        assertNotNull(image);
+        assertEquals(GameConfig.WIDTH * 5, image.getWidth());
+        assertEquals(GameConfig.HEIGHT, image.getHeight());
     }
 
     @Test

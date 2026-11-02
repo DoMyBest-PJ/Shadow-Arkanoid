@@ -104,7 +104,7 @@ public final class PhysicsEngine {
             if (ball.velocityY() > 0 && ball.y() + ball.radius() >= paddle.y()
                     && ball.x() + ball.radius() >= paddle.left()
                     && ball.x() - ball.radius() <= paddle.right()
-                    && previousY + ball.radius() <= paddle.y() + 1) {
+                    && previousY - ball.radius() <= paddle.y() + paddle.height()) {
                 resolvePaddleCollision(ball, paddle);
                 paddleHit = true;
             }

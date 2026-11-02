@@ -10,7 +10,7 @@ public final class GameConfig {
     public static final double HUD_HEIGHT = 170;
     public static final double PADDLE_Y = HEIGHT - 190;
     public static final double PADDLE_WIDTH = 200;
-    public static final double PADDLE_HEIGHT = 22;
+    public static final double PADDLE_HEIGHT = 10;
     public static final double PADDLE_SPEED = 560;
     public static final double BALL_RADIUS = 14;
     public static final double BALL_INITIAL_SPEED = 800;
