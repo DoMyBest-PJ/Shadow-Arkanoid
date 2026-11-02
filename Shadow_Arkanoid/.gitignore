@@ -13,6 +13,7 @@ logs/
 *.iws
 *.iml
 *.ipr
+*.pdf
 
 ### Eclipse ###
 .apt_generated
