@@ -73,7 +73,7 @@ public final class SoundManager implements AutoCloseable {
         if (eventClips != null && !eventClips.isEmpty()) {
             AudioClip clip = eventClips.get(ThreadLocalRandom.current().nextInt(eventClips.size()));
             if ("PARRY_SUCCESS".equals(event)) {
-                clip.play(0.55);
+                clip.play(0.25);
             } else {
                 clip.play();
             }

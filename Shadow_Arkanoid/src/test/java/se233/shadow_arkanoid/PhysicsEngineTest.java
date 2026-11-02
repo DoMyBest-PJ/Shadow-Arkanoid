@@ -85,6 +85,18 @@ class PhysicsEngineTest {
     }
 
     @Test
+    void ballIsCaughtWhenItFallsIntoThePaddleFromTheSide() {
+        Ball ball = new Ball(paddle.left() - GameConfig.BALL_RADIUS - 1,
+                paddle.y() + 2, 200, 100, GameConfig.BALL_RADIUS);
+
+        PhysicsEngine.BallResult result = physics.update(ball, paddle, List.of(), 0.05);
+
+        assertTrue(result.paddleHit());
+        assertTrue(ball.velocityY() < 0);
+        assertTrue(ball.y() <= paddle.y() - ball.radius());
+    }
+
+    @Test
     void piercingEndsAtTopLeftAndRightBoundaries() {
         assertPiercingEnds(new Ball(200, 7, 0, -100, 5));
         assertPiercingEnds(new Ball(7, 200, -100, 0, 5));

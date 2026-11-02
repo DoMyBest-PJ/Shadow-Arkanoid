@@ -364,8 +364,8 @@ public final class GameRenderer {
 
     private void drawBrick(GraphicsContext gc, Brick brick) {
         Color color = switch (brick.type()) {
-            case NORMAL -> Color.web("#42bfff");
-            case STRONG -> brick.durability() == 2 ? Color.web("#b46bff") : Color.web("#e0a1ff");
+            case NORMAL -> Color.web("#A8FF00");
+            case STRONG -> brick.durability() == 2 ? Color.web("#FF3B30") : Color.web("#A8FF00");
             case BONUS -> Color.web("#ffc34f");
         };
         if (brick.hitFlash() > 0) color = Color.WHITE;
@@ -378,14 +378,7 @@ public final class GameRenderer {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(2);
         gc.strokeRoundRect(brick.x(), brick.y(), brick.width(), brick.height(), 9, 9);
-        if (brick.type() == BrickType.STRONG) {
-            gc.setFill(Color.web("#201537"));
-            gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 18));
-            gc.setTextAlign(TextAlignment.CENTER);
-            gc.setTextBaseline(VPos.CENTER);
-            gc.fillText(Integer.toString(brick.durability()), brick.x() + brick.width() / 2,
-                    brick.y() + brick.height() / 2 + 2);
-        } else if (brick.type() == BrickType.BONUS) {
+        if (brick.type() == BrickType.BONUS) {
             gc.setFill(Color.web("#462d00"));
             gc.setFont(Font.font("Monospaced", FontWeight.BOLD, 18));
             gc.setTextAlign(TextAlignment.CENTER);
@@ -447,6 +440,16 @@ public final class GameRenderer {
 
     private void drawPaddle(GraphicsContext gc, GameWorld world) {
         Paddle paddle = world.paddle();
+        double baseX = paddle.left() - 6;
+        double baseY = paddle.y() - 4;
+        double baseWidth = paddle.width() + 12;
+        double baseHeight = paddle.height() + 10;
+        gc.setFill(Color.rgb(3, 10, 24, 0.92));
+        gc.fillRoundRect(baseX, baseY, baseWidth, baseHeight, 14, 14);
+        gc.setStroke(CYAN);
+        gc.setLineWidth(2.5);
+        gc.strokeRoundRect(baseX, baseY, baseWidth, baseHeight, 14, 14);
+
         if (katanaPaddleSpriteSheet != null) {
             double cycleTime = visualEffects.elapsedTime() % GameConfig.KATANA_PADDLE_ANIMATION_CYCLE_SECONDS;
             int frameIndex = (int) ((cycleTime / GameConfig.KATANA_PADDLE_ANIMATION_CYCLE_SECONDS)
