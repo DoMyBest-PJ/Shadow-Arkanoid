@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
+import se233.shadow_arkanoid.view.FrameLayout;
 import se233.shadow_arkanoid.view.GameRenderer;
 import se233.shadow_arkanoid.model.Brick;
 import se233.shadow_arkanoid.model.Paddle;

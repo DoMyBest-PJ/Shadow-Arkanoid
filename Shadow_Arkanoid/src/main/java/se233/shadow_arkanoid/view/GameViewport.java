@@ -5,7 +5,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import se233.shadow_arkanoid.FrameLayout;
 import se233.shadow_arkanoid.model.GameState;
 
 public final class GameViewport extends Pane {

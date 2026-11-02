@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se233.shadow_arkanoid.controller.GameController;
+import se233.shadow_arkanoid.view.FrameLayout;
 import se233.shadow_arkanoid.view.GameViewport;
 import se233.shadow_arkanoid.view.GameRenderer;
 import se233.shadow_arkanoid.view.audio.SoundManager;
@@ -37,6 +38,7 @@ public final class GameApplication extends Application {
         LOGGER.info("Shadow Arkanoid started");
     }
 
+    //ตอนปิดแสดงคำ
     @Override
     public void stop() {
         LOGGER.info("Shadow Arkanoid stopped");

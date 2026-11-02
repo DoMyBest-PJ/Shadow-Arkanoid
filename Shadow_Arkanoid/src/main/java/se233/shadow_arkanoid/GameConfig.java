@@ -1,6 +1,7 @@
 package se233.shadow_arkanoid;
 
 import se233.shadow_arkanoid.exception.GameConfigurationException;
+import se233.shadow_arkanoid.view.FrameLayout;
 
 public final class GameConfig {
     public static final String TITLE = "SHADOW ARKANOID";
@@ -16,7 +17,7 @@ public final class GameConfig {
     public static final double BALL_INITIAL_SPEED = 800;
     public static final double BALL_MAX_SPEED = 2000;
     public static final double MIN_VERTICAL_SPEED_RATIO = 0.22;
-    public static final int STARTING_LIVES = 99;
+    public static final int STARTING_LIVES = 5;
     public static final int PARRY_BONUS = 150;
     public static final double PARRY_SPEED_MULTIPLIER = 1.5;
     public static final double PARRY_COOLDOWN_SECONDS = 1.5;
@@ -45,6 +46,7 @@ public final class GameConfig {
         validate();
     }
 
+    //เช็คว่าค่าที่ใส่ไปไม่มีผิด
     private static void validate() {
         if (WIDTH <= 0 || HEIGHT <= 0 || PADDLE_WIDTH <= 0 || PADDLE_HEIGHT <= 0
                 || BALL_RADIUS <= 0 || BALL_INITIAL_SPEED <= 0 || BALL_MAX_SPEED < BALL_INITIAL_SPEED
