@@ -366,7 +366,7 @@ public final class GameRenderer {
         Color color = switch (brick.type()) {
             case NORMAL -> Color.web("#A8FF00");
             case STRONG -> brick.durability() == 2 ? Color.web("#FF3B30") : Color.web("#A8FF00");
-            case BONUS -> Color.web("#ffc34f");
+            case BONUS -> Color.web("#FFD400");
         };
         if (brick.hitFlash() > 0) color = Color.WHITE;
         gc.setFill(color.deriveColor(0, 0.78, 0.72, 1));
