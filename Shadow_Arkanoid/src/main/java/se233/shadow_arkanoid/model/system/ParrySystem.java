@@ -74,4 +74,8 @@ public final class ParrySystem {
         }
         return folded <= range ? left + folded : right - (folded - range);
     }
+
+    public double cooldownRemaining() { return cooldownRemaining; }
+    public double timingWindow() { return timingWindow; }
+
 }

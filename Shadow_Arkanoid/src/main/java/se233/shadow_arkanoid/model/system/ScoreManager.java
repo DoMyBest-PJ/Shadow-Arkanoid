@@ -42,4 +42,8 @@ public final class ScoreManager {
         score = 0;
         multiplier = 1;
     }
+
+    public int score() { return score; }
+    public int highestScore() { return highestScore; }
+    public double multiplier() { return multiplier; }
 }

@@ -5,6 +5,8 @@ import se233.shadow_arkanoid.GameConfig;
 public final class SpecialSkillDrop {
     private final double x;
     private double y;
+    public double x() { return x; }
+    public double y() { return y; }
 
     //drop ถูกที่อะปล่าว
     public SpecialSkillDrop(double x, double y) {
