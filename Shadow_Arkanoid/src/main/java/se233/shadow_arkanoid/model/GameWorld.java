@@ -321,9 +321,6 @@ public final class GameWorld {
         state = GameState.READY;
     }
 
-    public void movePaddleTo(double x) {
-        paddle.moveTo(x);
-    }
 
     public void addLife() {
         lifeManager.addLife();
