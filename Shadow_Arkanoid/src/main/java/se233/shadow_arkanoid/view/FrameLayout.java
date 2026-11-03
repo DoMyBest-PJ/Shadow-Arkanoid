@@ -1,4 +1,4 @@
-package se233.shadow_arkanoid;
+package se233.shadow_arkanoid.view;
 
 public final class FrameLayout {
     public static final String IMAGE_RESOURCE = "/se233/shadow_arkanoid/assets/picture/Frame.png";
@@ -8,9 +8,6 @@ public final class FrameLayout {
     public static final double GAMEPLAY_Y = 109;
     public static final double GAMEPLAY_WIDTH = 927;
     public static final double GAMEPLAY_HEIGHT = 1212;
-
-    private FrameLayout() {
-    }
 
     public static double scaleFor(double viewportWidth, double viewportHeight) {
         if (!Double.isFinite(viewportWidth) || !Double.isFinite(viewportHeight)
