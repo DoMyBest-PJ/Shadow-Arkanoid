@@ -12,10 +12,12 @@ public final class ParrySystem {
     private double cooldownRemaining;
     private double timingWindow = GameConfig.PARRY_WINDOW_SECONDS;
 
+    //ทำ parry
     public boolean attempt(Ball ball, Paddle paddle) {
         return tryParry(ball, paddle).isPresent();
     }
 
+    //ลูกบอลอยู่ในเวลาที่สามารถ Parry ไหม
     public Optional<Impact> tryParry(Ball ball, Paddle paddle) {
         if (cooldownRemaining > 0 || ball.isAttached() || ball.velocityY() <= 0) {
             return Optional.empty();
@@ -58,11 +60,9 @@ public final class ParrySystem {
     }
 
     public boolean isAvailable() { return cooldownRemaining <= 0; }
-    public double cooldownRemaining() { return cooldownRemaining; }
     public double cooldownFraction() {
         return 1 - cooldownRemaining / GameConfig.PARRY_COOLDOWN_SECONDS;
     }
-    public double timingWindow() { return timingWindow; }
 
     private double reflectedX(double x, double radius) {
         double left = GameConfig.WALL_MARGIN + radius;
@@ -74,4 +74,8 @@ public final class ParrySystem {
         }
         return folded <= range ? left + folded : right - (folded - range);
     }
+
+    public double cooldownRemaining() { return cooldownRemaining; }
+    public double timingWindow() { return timingWindow; }
+
 }

@@ -37,12 +37,13 @@ public final class ScoreManager {
         this.multiplier = multiplier;
     }
 
-    public int score() { return score; }
-    public int highestScore() { return highestScore; }
-    public double multiplier() { return multiplier; }
 
     public void reset() {
         score = 0;
         multiplier = 1;
     }
+
+    public int score() { return score; }
+    public int highestScore() { return highestScore; }
+    public double multiplier() { return multiplier; }
 }
