@@ -15,6 +15,7 @@ public final class Paddle {
         centerX = clamp(x);
     }
 
+    // adjust paddle width when get ExtendedPaddleUpgrade()
     public void setWidthMultiplier(double multiplier) {
         if (!Double.isFinite(multiplier) || multiplier <= 0) {
             throw new IllegalArgumentException("Paddle width multiplier must be positive");
@@ -23,6 +24,7 @@ public final class Paddle {
         centerX = clamp(centerX);
     }
 
+    // adjust paddle width when get SpeedControlUpgrade()
     public void setMovementSpeedMultiplier(double multiplier) {
         if (!Double.isFinite(multiplier) || multiplier <= 0) {
             throw new IllegalArgumentException("Movement speed multiplier must be positive");

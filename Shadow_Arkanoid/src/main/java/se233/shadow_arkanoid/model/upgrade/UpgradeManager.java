@@ -13,6 +13,7 @@ public final class UpgradeManager {
         this(new Random());
     }
 
+    // random upgrade buff
     public UpgradeManager(Random random) {
         this.random = random;
         upgrades = List.of(new ExtendedPaddleUpgrade(), new ExtraLifeUpgrade(), new MultiBallUpgrade(),

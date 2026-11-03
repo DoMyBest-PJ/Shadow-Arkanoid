@@ -34,10 +34,8 @@ public final class Ball {
         }
     }
 
-    public void launch() {
-        launch(0.26);
-    }
 
+    // ตี the ball
     public void launch(double horizontalRatio) {
         if (attached) {
             double ratio = Math.max(-0.75, Math.min(0.75, horizontalRatio));
@@ -47,6 +45,7 @@ public final class Ball {
         }
     }
 
+    // attach ball with paddle when start game , restart game
     public void attachAt(double centerX, double paddleY) {
         attached = true;
         x = centerX;
@@ -69,6 +68,7 @@ public final class Ball {
         this.y = y;
     }
 
+    // increase ball speed 1.5x and when ball hit the wall -> change ball speed to normal
     public void scaleSpeed(double multiplier, double maximumSpeed) {
         if (!Double.isFinite(multiplier) || multiplier <= 0 || maximumSpeed <= 0) {
             throw new IllegalArgumentException("Speed multiplier and maximum must be positive");
@@ -81,6 +81,7 @@ public final class Ball {
         velocityX = velocityX / speed * target;
         velocityY = velocityY / speed * target;
     }
+
 
     public void setSpeed(double targetSpeed) {
         double currentSpeed = speed();

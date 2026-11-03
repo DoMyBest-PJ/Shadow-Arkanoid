@@ -26,6 +26,7 @@ public final class Brick {
         this.durability = type.durability();
     }
 
+    // brick hit by the ball
     public void hit() {
         if (destroyed) {
             return;
@@ -37,6 +38,7 @@ public final class Brick {
         }
     }
 
+    // destroy brick immedietely when hit by slash power
     public boolean destroy() {
         if (destroyed) {
             return false;
@@ -58,9 +60,6 @@ public final class Brick {
         hitFlash = Math.max(0, hitFlash - deltaTime);
     }
 
-    public Rectangle2D bounds() {
-        return new Rectangle2D(x, y, width, height);
-    }
 
     public double x() { return x; }
     public double y() { return y; }

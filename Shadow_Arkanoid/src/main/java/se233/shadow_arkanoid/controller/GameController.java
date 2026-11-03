@@ -63,6 +63,7 @@ public final class GameController {
         }
         syncMusicWithGameState();
         animationTimer = new AnimationTimer() {
+
             @Override
             public void handle(long now) {
                 double deltaTime = previousFrame == 0 ? 0 : (now - previousFrame) / 1_000_000_000.0;
@@ -91,6 +92,7 @@ public final class GameController {
         soundManager.close();
     }
 
+    // handle spcebar key(start game, parry), esc,p key(stop game)
     private void handleKeyPressed(KeyCode code) {
         if (code == KeyCode.ESCAPE || code == KeyCode.P) {
             world.pause();
@@ -113,6 +115,7 @@ public final class GameController {
         }
     }
 
+    // detect mouse position on button(Start, how to play, exit, upgrade selection)
     private void handleClick(double x, double y) {
         if (isOnMusicSlider(x, y)) {
             adjustingMusicVolume = true;

@@ -14,6 +14,7 @@ public final class SpecialSkillDrop {
         this.y = y;
     }
 
+    // skill drop ลงมาตามนวดิ่ง
     public void update(double deltaTime) {
         if (!Double.isFinite(deltaTime) || deltaTime < 0) {
             throw new IllegalArgumentException("Delta time must be finite and non-negative");
@@ -21,6 +22,7 @@ public final class SpecialSkillDrop {
         y += GameConfig.SPECIAL_SKILL_DROP_SPEED * deltaTime;
     }
 
+    //
     public boolean isCollectedBy(Paddle paddle) {
         return x + GameConfig.SPECIAL_SKILL_DROP_SIZE / 2 >= paddle.left()
                 && x - GameConfig.SPECIAL_SKILL_DROP_SIZE / 2 <= paddle.right()
